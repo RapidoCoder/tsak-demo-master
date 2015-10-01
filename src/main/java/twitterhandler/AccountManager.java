@@ -41,8 +41,8 @@ public class AccountManager {
 	List<Map<String, Object>> maplists_return;
 	List <Object> objlist_return;
 	Map<String, Object> mapObj_return;
-	Paging page;
-	public AccountManager (Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg,Paging paging) {
+
+	public AccountManager (Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg) {
 		
 		ddManager = ddm;
 		cRManager = crm;
@@ -51,7 +51,7 @@ public class AccountManager {
 		maplists_return = new ArrayList<Map<String, Object>>();
 		objlist_return = new ArrayList<Object> ();
 		mapObj_return = new HashMap<String, Object>();
-		page = paging;
+
 	}
 	
 
@@ -414,7 +414,7 @@ public class AccountManager {
 			
 			timeStart = System.currentTimeMillis();
 
-
+			Paging page = new Paging(1,200);
 			
 			do {
 				

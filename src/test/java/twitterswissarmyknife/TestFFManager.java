@@ -32,7 +32,7 @@ import dto.CrManager;
 import dto.DDManager;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class, Paging.class })
+@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
 public class TestFFManager {
 	@Mock
 	CrManager cRManager;
@@ -47,7 +47,6 @@ public class TestFFManager {
 	ResponseList<User> followers;
 	ResponseList<User> followings;
 	FFManager fmanager;
-	Paging page;
 
 	@Before
 	public void setup() throws Exception {
@@ -65,9 +64,7 @@ public class TestFFManager {
 		followers = Mockito.mock(ResponseList.class);
 		followings = Mockito.mock(ResponseList.class);
 		ddManager = Mockito.mock(DDManager.class);
-		PowerMockito.whenNew(Paging.class).withArguments(1, 200)
-				.thenReturn(page);
-		page = Mockito.mock(Paging.class);
+
 	}
 
 	// ////////////////////////
@@ -102,7 +99,7 @@ public class TestFFManager {
 				.thenReturn(followers);
 
 		AppLauncher obj = new AppLauncher(cVectors, cRManager, argManager,
-				scObj, tAuth, lManager, ddManager,page);
+				scObj, tAuth, lManager, ddManager);
 		obj.initLaunchSequence(args);
 		assertEquals(
 				fmanager.dumpFFToFile("123", subCmdUpVector.FLWRZ_DUMP_BY_ID),
@@ -143,7 +140,7 @@ public class TestFFManager {
 				followers);
 
 		AppLauncher obj = new AppLauncher(cVectors, cRManager, argManager,
-				scObj, tAuth, lManager, ddManager,page);
+				scObj, tAuth, lManager, ddManager);
 		obj.initLaunchSequence(args);
 		assertEquals(fmanager.dumpFFToFile("ScreenName",
 				subCmdUpVector.FLWRZ_DUMP_BY_SCREEN_NAME), followers);
@@ -182,7 +179,7 @@ public class TestFFManager {
 				followings);
 
 		AppLauncher obj = new AppLauncher(cVectors, cRManager, argManager,
-				scObj, tAuth, lManager, ddManager,page);
+				scObj, tAuth, lManager, ddManager);
 		obj.initLaunchSequence(args);
 		assertEquals(fmanager.dumpFFToFile("ScreenName",
 				subCmdUpVector.FRNDZ_DUMP_BY_SCREEN_NAME), followings);
@@ -218,7 +215,7 @@ public class TestFFManager {
 				.thenReturn(followings);
 
 		AppLauncher obj = new AppLauncher(cVectors, cRManager, argManager,
-				scObj, tAuth, lManager, ddManager,page);
+				scObj, tAuth, lManager, ddManager);
 		obj.initLaunchSequence(args);
 		assertEquals(
 				fmanager.dumpFFToFile("123", subCmdUpVector.FRNDZ_DUMP_BY_ID),

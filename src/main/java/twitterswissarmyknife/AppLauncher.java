@@ -37,7 +37,6 @@ public class AppLauncher {
 	boolean toBeVerifiedENV = false;
 	boolean readFromENV = false;
 	Scanner s;
-	Paging page;
 
 	public AppLauncher() {
 
@@ -54,8 +53,7 @@ public class AppLauncher {
 					   subCmdUpVector scObj,
 					   TwitterAuth tAuth,
 					   LimitsManager lManager,
-					   DDManager ddManager,
-					   Paging page
+					   DDManager ddManager
 			) {
 		this.cVectors = cVectors;
 		this.cRManager = cRManager;
@@ -64,7 +62,6 @@ public class AppLauncher {
 		this.tAuth = tAuth;
 		this.lManager = lManager;
 		this.ddManager = ddManager;
-		this.page = page;
 
 	}
 
@@ -214,7 +211,7 @@ public class AppLauncher {
 		} else if (scObj == subCmdUpVector.BLOCK_LIST) {
 
 			AccountManager amanager = new AccountManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager,page);
+					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			amanager.getBlockList();
 
 		} else if (scObj == subCmdUpVector.SHOW_FRNDSHIP) {
@@ -235,7 +232,7 @@ public class AppLauncher {
 		} else if (scObj == subCmdUpVector.FAVOURITES) {
 
 			AccountManager amanager = new AccountManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager,page);
+					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			amanager.getFavourities();
 
 		} else if (scObj == subCmdUpVector.SUGGESTED_USER_CATS) {
@@ -266,7 +263,7 @@ public class AppLauncher {
 		} else if (scObj == subCmdUpVector.SAVED_SEARCHES) {
 
 			AccountManager amanager = new AccountManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager,page);
+					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			amanager.SavedSearches();
 
 		} else if (scObj == subCmdUpVector.LOOKUP_FRNDSHIP) {
@@ -303,7 +300,7 @@ public class AppLauncher {
 		} else if (scObj == subCmdUpVector.ACCOUNT_SETTINGS) {
 
 			AccountManager amanager = new AccountManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager,page);
+					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			amanager.getAccountSettingsJson();
 		} else if (scObj == subCmdUpVector.AVAILABLE_TRENDS) {
 
@@ -324,17 +321,17 @@ public class AppLauncher {
 		} else if (scObj == subCmdUpVector.MUTES_IDS) {
 
 			AccountManager amanager = new AccountManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager,page);
+					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			amanager.getMutesIds();
 		} else if (scObj == subCmdUpVector.MUTES_LIST) {
 
 			AccountManager amanager = new AccountManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager,page);
+					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			amanager.getMutesLists();
 		} else if (scObj == subCmdUpVector.LISTS_MEMEBERSHIPS) {
 
 			AccountManager amanager = new AccountManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager,page);
+					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			amanager.userListMemberships();
 		} else if (scObj == subCmdUpVector.LIST_SUBSCRIBERS
 				|| scObj == subCmdUpVector.LIST_MEMBERS) {

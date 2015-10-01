@@ -39,7 +39,7 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class, Paging.class })
+@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
 public class TestAccountManager {
 
 	@Mock
@@ -73,7 +73,6 @@ public class TestAccountManager {
 	PagableResponseList<User> users;
 	User tuser;
 	Iterator<User> userIterator;
-	Paging page;
 
 	@Before
 	public void setup() throws Exception {
@@ -107,12 +106,6 @@ public class TestAccountManager {
 		statusIterator = Mockito.mock(Iterator.class);
 		objlist_return = Mockito.mock(List.class);
 		mapObj_return = Mockito.mock(Map.class);
-
-		
-	PowerMockito.whenNew(Paging.class).withArguments(1, 200)
-		.thenReturn(page);
-	page = Mockito.mock(Paging.class);
-
 	}
 
 	@Test
@@ -147,7 +140,7 @@ public class TestAccountManager {
 		Mockito.when(list.getDescription()).thenReturn("some description");
 		// Mockito.when(list.getURI()).thenReturn(/RodResearch/lists/global-citizen-main-stage);
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
-				cRManager, lManager,page);
+				cRManager, lManager);
 
 		Map<String, Object> expextedMap = new HashMap<String, Object>();
 		expextedMap.put("id", 1L);
@@ -180,7 +173,7 @@ public class TestAccountManager {
 		Mockito.when(ids.getIDs()).thenReturn(idsValue);
 		Mockito.when(ids.getNextCursor()).thenReturn(15L);
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
-				cRManager, lManager,page);
+				cRManager, lManager);
 		List<Object> result = accountManager.getMutesIds();
 
 		assertEquals(result.get(0), expected.get(0));
@@ -222,7 +215,7 @@ public class TestAccountManager {
 		expected.add(expectedMap);
 
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
-				cRManager, lManager,page);
+				cRManager, lManager);
 		List<Map<String, Object>> result = accountManager.getMutesLists();
 		assertEquals(result, expected);
 	}
@@ -299,7 +292,7 @@ public class TestAccountManager {
 		List<String> expectedResult = new ArrayList<String>();
 		expectedResult.add(expected.toString());
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
-				cRManager, lManager,page);
+				cRManager, lManager);
 		List<Object> result = accountManager.SavedSearches();
 		assertEquals(result.get(0), expectedResult.get(0));
 	}
@@ -317,7 +310,7 @@ public class TestAccountManager {
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.FAVORITES_LIST)).thenReturn(lmts);
-	
+		Paging page = new Paging(1,200);
 		Mockito.when(twitter.getFavorites(page)).thenReturn(statuses);
 
 		Mockito.when(statusIterator.hasNext()).thenReturn(true, false);
@@ -328,7 +321,7 @@ public class TestAccountManager {
 		 Mockito.when(tuser.getScreenName()).thenReturn("some screen_name");
 		Mockito.when(status.getText()).thenReturn("some tweet");
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
-				cRManager, lManager,page);
+				cRManager, lManager);
 		List<Map<String, Object>> result = accountManager.getFavourities();
 		assertEquals(result.get(0), expected.get(0));
 
@@ -355,7 +348,7 @@ public class TestAccountManager {
 			Mockito.when(tuser.getScreenName()).thenReturn("some screen name");
 		
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
-				cRManager, lManager,page);
+				cRManager, lManager);
 		List<Object> result = accountManager.getBlockList();
 		assertEquals(result, expected);
 		
