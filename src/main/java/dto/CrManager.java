@@ -46,15 +46,6 @@ public class CrManager {
 		if (env_var == null || env_var.isEmpty()) {
 			DisplayInfoMessage("[INFO]: Skipping Environment variable, TSAK_CONF not set.",true);
 			
-//			DisplayInfoMessage("[INFO]: Searching local directory for conf.properties file.",true);
-//			
-//			File propConfFile = new File("tsak.properties");
-//
-//			if (!propConfFile.exists() || !propConfFile.isFile()) {
-//				DisplayErrorMessage("[ERROR]: Couldn't read tsak.properties File.", true);
-//				return false;
-//			} 
-			
 			return false;
 		} else {
 

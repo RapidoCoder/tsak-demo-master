@@ -1,5 +1,6 @@
 package twitterhandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,16 @@ public class SearchManager {
 	CrManager cRManager;
 	LimitsManager lManager;
 	Long timeStart= null, timeEnd= null;
+	private ResponseList<User> users;
+	private Map<String, Object> user;
+	private JSONObject jObj;
+	
+	private List <String> smReturn;
+	private QueryResult results;
+	private Query query;
+	private List<Status> tweets;
+	private Map<String,String> userInfo;
+	private Map<String, Object> tweetMap;
 	
 	public SearchManager(Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg) {
 		
@@ -32,10 +43,11 @@ public class SearchManager {
 		cRManager = crm;
 		lManager = lmg;
 		twitter = twtr;
+		smReturn = new ArrayList<String>();
 	}
 	
 	
-	public void searchUsers(String keywords) throws TsakException {
+	public List<String> searchUsers(String keywords) throws TsakException {
 
 		cRManager.DisplayInfoMessage(
 				"[INFO]: Checking Rate Limits Availibity.", true);
@@ -62,13 +74,10 @@ public class SearchManager {
 			
 			timeStart = System.currentTimeMillis();
 			int page = -1;
-			ResponseList<User> users;
-
 			do {
 				users = twitter.searchUsers(keywords,page);
 				for (User tuser : users) {
-					Map<String, Object> user = new HashMap<String, Object>();
-
+					user = new HashMap<String, Object>();
 					user.put("screen_name", tuser.getScreenName());
 					user.put("name", tuser.getName());
 					user.put("id", tuser.getId());
@@ -78,8 +87,9 @@ public class SearchManager {
 					user.put("location", tuser.getLocation());
 					user.put("language", tuser.getLang());
 
-					JSONObject json_user = new JSONObject(user);
-					ddManager.writeLine(json_user.toString(), true);
+					jObj = new JSONObject(user);
+					smReturn.add(jObj.toString());
+					//ddManager.writeLine(jObj.toString(), true);
 				}
 
 				page++;
@@ -96,10 +106,12 @@ public class SearchManager {
 			cRManager.DisplayInfoMessage("[ERROR]: " + te.getMessage(), true);
 		} finally {
 		}
+		
+		return smReturn;
 	}
 	
 	
-	public void searchTweets(String keyWords) throws TsakException {
+	public List<String> searchTweets(String keyWords) throws TsakException {
 
 		int numDumpTweets = 0;
 		
@@ -114,10 +126,6 @@ public class SearchManager {
 		cRManager.DisplayInfoMessage("[INFO]: " + availableCalls
 				+ " Calls Available in " + availableTime
 				+ " seconds.", true);
-
-		Query query;
-
-		QueryResult results;
 
 		try {
 
@@ -134,13 +142,13 @@ public class SearchManager {
 			do {
 				results = twitter.search(query);
 
-				List<Status> tweets = results.getTweets();
+				tweets = results.getTweets();
+				
 				for (Status tweet : tweets) {
 					
 					numDumpTweets ++;
 					
-					//save properties in map
-					Map<String,String> userInfo = new HashMap<String,String>();
+					userInfo = new HashMap<String,String>();
 					userInfo.put("Name", tweet.getUser().getName());
 					userInfo.put("Screen_name", tweet.getUser().getScreenName());
 					userInfo.put("ID", String.valueOf(tweet.getUser().getId()));
@@ -150,15 +158,16 @@ public class SearchManager {
 					userInfo.put("FriendsCount", String.valueOf(tweet.getUser().getFriendsCount()));
 					userInfo.put("FriendsCount", String.valueOf(tweet.getUser().getFollowersCount()));
 					
-					Map<String, Object> tweetMap = new HashMap<String, Object>();
+					tweetMap = new HashMap<String, Object>();
 					tweetMap.put("user", userInfo);
 					tweetMap.put("tweet", tweet.getText());
 
 					
-					JSONObject json = new JSONObject(tweetMap);
+					jObj = new JSONObject(tweetMap);
 					
+					smReturn.add(jObj.toString());
 					//write json to output file
-					ddManager.writeLine(json.toString(), true);	
+					//ddManager.writeLine(json.toString(), true);	
 				}
 			} while ((query = results.nextQuery()) != null);
 			
@@ -173,5 +182,7 @@ public class SearchManager {
 			cRManager.DisplayErrorMessage("[ERROR]: " + te.getMessage(), true);
 			
 		}
+		
+		return smReturn;
 	}
 }
