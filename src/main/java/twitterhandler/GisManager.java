@@ -51,7 +51,6 @@ public class GisManager {
 		cRManager = crm;
 		lManager = lmg;
 		twitter = twtr;
-		
 		gisReturn = new ArrayList<String>();
 	}
 
@@ -83,25 +82,24 @@ public class GisManager {
 					"[INFO]: Getting similar geo places....", true);
 
 			timeStart = System.currentTimeMillis();
-			
+
 			location = new GeoLocation(
 					Double.parseDouble(TwitterCredentials.getLatitude()),
 					Double.parseDouble(TwitterCredentials.getLongitude()));
-			
 			String name = TwitterCredentials.getPlaceName();
 
 			places = twitter.getSimilarPlaces(location,
 					name, null, null);
-			 
+
 			if (places.size() == 0) {
-              
+
 				cRManager
 						.DisplayInfoMessage(
 								"[INFO]: No location associated with the specified condition",
 								true);
 
 			} else {
-				 
+
 				for (Place place : places) {
 
 					geoMap = new HashMap<String, Object>();
@@ -271,11 +269,11 @@ public class GisManager {
 			cRManager.DisplayInfoMessage("[INFO]: Searching Geo Location....", true);
 
 			timeStart = System.currentTimeMillis();
-			
+
 			query = new GeoQuery(new GeoLocation(
 					Double.parseDouble(TwitterCredentials.getLatitude()),
 					Double.parseDouble(TwitterCredentials.getLongitude())));
-			
+
 			places = twitter.searchPlaces(query);
 
 			if (places.size() == 0) {
@@ -318,7 +316,7 @@ public class GisManager {
 
 						geoMap.put("contained_within", containList);
 					}
-					
+
 					jObj = new JSONObject (geoMap);
 					gisReturn.add(jObj.toString());
 					

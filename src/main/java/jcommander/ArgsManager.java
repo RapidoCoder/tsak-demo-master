@@ -117,14 +117,14 @@ public class ArgsManager {
 			}
 
 		} catch (ParameterException e) {
-			cRManager.DisplayErrorMessage("[ERROE]: " + e.getMessage(), true);
+			cRManager.DisplayErrorMessage("[ERROR]: " + e.getMessage(), true);
 			System.exit(-1);
 		} catch (TsakException e) {
 
-			cRManager.DisplayErrorMessage("[ERROE]: " + e.getMessage(), true);
+			cRManager.DisplayErrorMessage("[ERROR]: " + e.getMessage(), true);
 		} catch (Exception e) {
 
-			cRManager.DisplayErrorMessage("[ERROE]: " + e.getMessage(), true);
+			cRManager.DisplayErrorMessage("[ERROR]: " + e.getMessage(), true);
 		}
 
 		return returnObj;

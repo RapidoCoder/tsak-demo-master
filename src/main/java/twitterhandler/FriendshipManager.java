@@ -34,23 +34,21 @@ public class FriendshipManager {
 	CrManager cRManager;
 	LimitsManager lManager;
 	Long timeStart, timeEnd;
-
+	
 	IDs ids;
 	List<Long> idsList;
 	List<String> screenNames;
 	ResponseList<Friendship> friendships;
 	BufferedReader bReader;
-	Map<String, Object> obj;
-	Map<String, Object> tar;
+	Map<String, Object> obj; Map<String, Object> tar;
 	JSONObject jObj;
-	List<String> ffReturn;
+	List <String> ffReturn;
 	Relationship relationship;
 	Map<String, Object> rel;
 	PagableResponseList<User> users;
-
-	public FriendshipManager(Twitter twtr, DDManager ddm, CrManager crm,
-			LimitsManager lmg) {
-
+	
+	public FriendshipManager(Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg) {
+		
 		ddManager = ddm;
 		cRManager = crm;
 		lManager = lmg;
@@ -59,10 +57,9 @@ public class FriendshipManager {
 		ffReturn = new ArrayList<String>();
 	}
 
-	public List<Long> iOFriendships(subCmdUpVector sbv) throws TsakException {
+	public List<Long> iOFriendships(subCmdUpVector sbv) throws TsakException  {
 
-		cRManager.DisplayInfoMessage(
-				"[INFO]: Checking Rate Limits Availibity.", true);
+		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 
 		int availableCalls = 0;
 		int availableTime = 0;
@@ -91,32 +88,31 @@ public class FriendshipManager {
 						"[ERROE]: Twitter Rate Limit Exceeded. Please try again after "
 								+ availableTime + " Seconds.");
 			}
+			
 
-			cRManager.DisplayInfoMessage(
-					"[INFO]: Getting friendship links....", true);
-
+			cRManager.DisplayInfoMessage("[INFO]: Getting friendship links....", true);
+			
 			timeStart = System.currentTimeMillis();
 			long cursor = -1;
 
 			do {
-
+				
 				if (sbv == subCmdUpVector.INCOMING_FRNDSHIP) {
-
 					ids = twitter.getIncomingFriendships(cursor);
 
 				} else if (sbv == subCmdUpVector.OUTGOING_FRNDSHIP) {
 					ids = twitter.getOutgoingFriendships(cursor);
 				}
+
 				for (Long id : ids.getIDs()) {
 
 					idsList.add(id);
-					// ddManager.writeLine(String.valueOf(id) ,true);
+					//ddManager.writeLine(String.valueOf(id) ,true);
 				}
 
 				cursor = ids.getNextCursor();
-
 			} while (ids.getIDs().length > 0);
-
+			
 			timeEnd = System.currentTimeMillis();
 			cRManager.DisplayInfoMessage(
 					"[INFO]: Friendships links dumped successfully to "
@@ -134,14 +130,13 @@ public class FriendshipManager {
 
 		return idsList;
 	}
-
+	
 	public List<String> lookupFriendship() throws IOException, TsakException {
 
 		cRManager.DisplayInfoMessage(
 				"[INFO]: Checking Rate Limits Availibity.", true);
 
-		int lmts[] = cRManager.rateLimitAnalyzer(twitter, lManager,
-				LimitsEndPointsVector.FRIENDSHIPS_LOOKUP);
+		int lmts[] = cRManager.rateLimitAnalyzer(twitter, lManager,LimitsEndPointsVector.FRIENDSHIPS_LOOKUP);
 
 		int availableCalls = lmts[0];
 		int availableTime = lmts[1];
@@ -159,13 +154,13 @@ public class FriendshipManager {
 			}
 
 			timeStart = System.currentTimeMillis();
-
+			
 			bReader = new BufferedReader(new FileReader(new File(
 					TwitterCredentials.getInputFile())));
 
 			String line;
 			screenNames = new ArrayList<String>();
-			// List<Long> ids = new ArrayList<Long>();
+			//List<Long> ids = new ArrayList<Long>();
 
 			while ((line = bReader.readLine()) != null) {
 
@@ -198,7 +193,8 @@ public class FriendshipManager {
 					String[] stringArray = Arrays.copyOf(screenNames.toArray(),
 							screenNames.size(), String[].class);
 
-					friendships = twitter.lookupFriendships(stringArray);
+					friendships = twitter
+							.lookupFriendships(stringArray);
 
 					// dump now
 					for (Friendship friendship : friendships) {
@@ -217,8 +213,8 @@ public class FriendshipManager {
 						obj.put("target", tar);
 
 						jObj = new JSONObject(obj);
-
-						// ddManager.writeLine(jObj.toString(), true);
+						
+						//ddManager.writeLine(jObj.toString(), true);
 						ffReturn.add(jObj.toString());
 					}
 				}
@@ -234,7 +230,8 @@ public class FriendshipManager {
 				String[] stringArray = Arrays.copyOf(screenNames.toArray(),
 						screenNames.size(), String[].class);
 
-				friendships = twitter.lookupFriendships(stringArray);
+				friendships = twitter
+						.lookupFriendships(stringArray);
 
 				// dump now
 				for (Friendship friendship : friendships) {
@@ -254,17 +251,17 @@ public class FriendshipManager {
 
 					jObj = new JSONObject(obj);
 
-					// ddManager.writeLine(jObj.toString(), true);
+					//ddManager.writeLine(jObj.toString(), true);
 					ffReturn.add(jObj.toString());
-
+					
 				}
 
 			}
 
 			if (idsList.size() != 0) {
 
-				Long[] idsLong = Arrays.copyOf(idsList.toArray(),
-						idsList.size(), Long[].class);
+				Long[] idsLong = Arrays.copyOf(idsList.toArray(), idsList.size(),
+						Long[].class);
 
 				// Long[] idsLong = ((Long[]) ids.toArray());
 
@@ -277,8 +274,8 @@ public class FriendshipManager {
 						page[j] = idsLong[counter++];
 					}
 
-					friendships = twitter.lookupFriendships(ArrayUtils
-							.toPrimitive(page));
+					friendships = twitter
+							.lookupFriendships(ArrayUtils.toPrimitive(page));
 
 					// dump now
 					for (Friendship friendship : friendships) {
@@ -298,7 +295,7 @@ public class FriendshipManager {
 
 						jObj = new JSONObject(obj);
 
-						// ddManager.writeLine(jObj.toString(), true);
+						//ddManager.writeLine(jObj.toString(), true);
 						ffReturn.add(jObj.toString());
 					}
 
@@ -311,8 +308,8 @@ public class FriendshipManager {
 					page[k] = idsLong[counter++];
 				}
 
-				friendships = twitter.lookupFriendships(ArrayUtils
-						.toPrimitive(page));
+				friendships = twitter
+						.lookupFriendships(ArrayUtils.toPrimitive(page));
 
 				// dump now
 				for (Friendship friendship : friendships) {
@@ -332,7 +329,7 @@ public class FriendshipManager {
 
 					jObj = new JSONObject(obj);
 
-					// ddManager.writeLine(jObj.toString(), true);
+					//ddManager.writeLine(jObj.toString(), true);
 					ffReturn.add(jObj.toString());
 				}
 
@@ -344,7 +341,7 @@ public class FriendshipManager {
 							+ TwitterCredentials.getOutputFile() + " in "
 							+ String.valueOf((timeEnd - timeStart) / 1000F)
 							+ " seconds.", true);
-
+			
 		} catch (FileNotFoundException e) {
 
 			cRManager.DisplayInfoMessage("[ERROR]: " + e.getMessage(), true);
@@ -361,12 +358,12 @@ public class FriendshipManager {
 		return ffReturn;
 	}
 
+	
 	public String showFriendsShip() throws FileNotFoundException, TsakException {
 
 		Long timeStart = null, timeEnd = null;
 
-		cRManager.DisplayInfoMessage(
-				"[INFO]: Checking Rate Limits Availibity.", true);
+		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 
 		int lmts[] = cRManager.rateLimitAnalyzer(twitter, lManager,
 				LimitsEndPointsVector.FRIENDSHIPS_SHOW);
@@ -385,9 +382,8 @@ public class FriendshipManager {
 								+ availableTime + " Seconds.");
 			}
 
-			cRManager.DisplayInfoMessage(
-					"[INFO]: Looking up Friendship link....", true);
-
+			cRManager.DisplayInfoMessage("[INFO]: Looking up Friendship link....", true);
+			
 			timeStart = System.currentTimeMillis();
 
 			Long sid = null;
@@ -408,7 +404,7 @@ public class FriendshipManager {
 				relationship = twitter.showFriendship(
 						TwitterCredentials.gettSname(),
 						TwitterCredentials.gettTname());
-			} else {
+			}else {
 				throw new TsakException(
 						"[ERROE]: Please Provide either both Screen Name or both IDs for source and target users at a time.");
 			}
@@ -431,7 +427,7 @@ public class FriendshipManager {
 
 			jObj = new JSONObject(rel);
 
-			// ddManager.writeLine(jObj.toString(), true);
+			//ddManager.writeLine(jObj.toString(), true);
 
 			timeEnd = System.currentTimeMillis();
 			cRManager.DisplayInfoMessage(
@@ -445,20 +441,20 @@ public class FriendshipManager {
 
 		} finally {
 		}
-
+		
 		return jObj.toString();
 	}
-
-	public List<String> getFriendsList(subCmdUpVector sbv) throws TsakException {
+	
+	
+	public List<String> getFriendsList (subCmdUpVector sbv) throws TsakException {
 
 		Long timeStart = null, timeEnd = null;
 
-		cRManager.DisplayInfoMessage(
-				"[INFO]: Checking Rate Limits Availibity.", true);
-
+		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
+		
 		int availableCalls = 0;
 		int availableTime = 0;
-
+		
 		if (sbv == subCmdUpVector.FRIENDS_LIST) {
 			int lmts[] = cRManager.rateLimitAnalyzer(twitter, lManager,
 					LimitsEndPointsVector.FRIENDS_LIST);
@@ -473,76 +469,63 @@ public class FriendshipManager {
 
 		cRManager.DisplayInfoMessage("[INFO]: " + availableCalls
 				+ " Calls Available in " + availableTime + " seconds.", true);
-
+		
 		try {
-
+			
 			if (availableCalls == 0) {
 				throw new TsakException(
 						"[ERROE]: Twitter Rate Limit Exceeded. Please try again after "
 								+ availableTime + " Seconds.");
 			}
-
+			
 			cRManager.DisplayInfoMessage("[INFO]: Getting List....", true);
-
+			
 			timeStart = System.currentTimeMillis();
-
+			
 			long cursor = -1;
-
+			
 			do {
-
+				
 				try {
-
 					if (sbv == subCmdUpVector.FRIENDS_LIST) {
-
-						users = twitter.getFriendsList(
-								Long.parseLong(TwitterCredentials.getuID()),
-								cursor);
-					} else if (sbv == subCmdUpVector.FOLLOWERS_LIST) {
-						users = twitter.getFollowersList(
-								Long.parseLong(TwitterCredentials.getuID()),
-								cursor);
+						users = twitter.getFriendsList(Long.parseLong(TwitterCredentials.getuID()), cursor);
+					}else if (sbv == subCmdUpVector.FOLLOWERS_LIST) {
+						users = twitter.getFollowersList(Long.parseLong(TwitterCredentials.getuID()), cursor);
 					}
 				} catch (ClassCastException e) {
-
-					if (sbv == subCmdUpVector.FRIENDS_LIST) {
-						users = twitter.getFriendsList(
-								TwitterCredentials.getuScreenName(), cursor);
-					} else if (sbv == subCmdUpVector.FOLLOWERS_LIST) {
-						users = twitter.getFollowersList(
-								TwitterCredentials.getuScreenName(), cursor);
-					}
-
-				} catch (NumberFormatException e) {
-
-					if (sbv == subCmdUpVector.FRIENDS_LIST) {
-						users = twitter.getFriendsList(
-								TwitterCredentials.getuScreenName(), cursor);
-					} else if (sbv == subCmdUpVector.FOLLOWERS_LIST) {
-						users = twitter.getFollowersList(
-								TwitterCredentials.getuScreenName(), cursor);
-					}
-				}
-				for (int i = 0; i < users.size(); i++) {
 					
-
-					Map<String, Object> user = new HashMap<String, Object>();
-                   
-					user.put("screen_name", users.get(i).getScreenName());
-					user.put("name", users.get(i).getName());
-					user.put("id", users.get(i).getId());
-					user.put("profile_image", users.get(i)
-							.getBiggerProfileImageURL());
-					user.put("friends_count", users.get(i).getFriendsCount());
-					user.put("followers_count", users.get(i)
-							.getFollowersCount());
-					user.put("location", users.get(i).getLocation());
-					user.put("language", users.get(i).getLang());
-
-					jObj = new JSONObject(user);
-
-					ffReturn.add(jObj.toString());
-					// ddManager.writeLine(json_user.toString(), true);
+					if (sbv == subCmdUpVector.FRIENDS_LIST) {
+						users = twitter.getFriendsList(TwitterCredentials.getuScreenName(), cursor);
+					}else if (sbv == subCmdUpVector.FOLLOWERS_LIST) {
+						users = twitter.getFollowersList(TwitterCredentials.getuScreenName(), cursor);
+					}
+					
+				} catch (NumberFormatException e) {
+					
+					if (sbv == subCmdUpVector.FRIENDS_LIST) {
+						users = twitter.getFriendsList(TwitterCredentials.getuScreenName(), cursor);
+					}else if (sbv == subCmdUpVector.FOLLOWERS_LIST) {
+						users = twitter.getFollowersList(TwitterCredentials.getuScreenName(), cursor);
+					}
 				}
+					for (int i = 0; i < users.size(); i++) {
+						
+						Map<String, Object> user = new HashMap<String, Object>();
+						
+						user.put("screen_name", users.get(i).getScreenName());
+						user.put("name", users.get(i).getName());
+						user.put("id", users.get(i).getId());
+						user.put("profile_image", users.get(i).getBiggerProfileImageURL());
+						user.put("friends_count", users.get(i).getFriendsCount());
+						user.put("followers_count", users.get(i).getFollowersCount());
+						user.put("location", users.get(i).getLocation());
+						user.put("language", users.get(i).getLang());
+						
+						jObj = new JSONObject(user);
+						
+						ffReturn.add(jObj.toString());
+						//ddManager.writeLine(json_user.toString(), true);
+					}
 			} while ((cursor = users.getNextCursor()) != 0);
 
 			timeEnd = System.currentTimeMillis();
@@ -551,14 +534,14 @@ public class FriendshipManager {
 							+ TwitterCredentials.getOutputFile() + " in "
 							+ String.valueOf((timeEnd - timeStart) / 1000F)
 							+ " seconds.", true);
-
-		} catch (TwitterException te) {
+			
+		}catch (TwitterException te) {
 			cRManager.DisplayInfoMessage("[ERROR]: " + te.getMessage(), true);
 
-		} finally {
+		}finally {
 		}
-
+		
 		return ffReturn;
 	}
-
+	
 }

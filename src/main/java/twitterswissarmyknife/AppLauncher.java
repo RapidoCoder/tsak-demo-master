@@ -1,12 +1,14 @@
 package twitterswissarmyknife;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import jcommander.ArgsManager;
-import twitter4j.IDs;
-import twitter4j.Paging;
+import twitter4j.ResponseList;
 import twitter4j.TwitterException;
+import twitter4j.User;
 import twitterhandler.AccountManager;
 import twitterhandler.FFManager;
 import twitterhandler.FriendshipManager;
@@ -47,14 +49,9 @@ public class AppLauncher {
 		lManager = new LimitsManager();
 	}
 
-	public AppLauncher(controlVectors cVectors,
-					   CrManager cRManager,
-					   ArgsManager argManager,
-					   subCmdUpVector scObj,
-					   TwitterAuth tAuth,
-					   LimitsManager lManager,
-					   DDManager ddManager
-			) {
+	public AppLauncher(controlVectors cVectors, CrManager cRManager,
+			ArgsManager argManager, subCmdUpVector scObj, TwitterAuth tAuth,
+			LimitsManager lManager, DDManager ddManager) {
 		this.cVectors = cVectors;
 		this.cRManager = cRManager;
 		this.argManager = argManager;
@@ -62,15 +59,14 @@ public class AppLauncher {
 		this.tAuth = tAuth;
 		this.lManager = lManager;
 		this.ddManager = ddManager;
-
 	}
 
 	public final void initLaunchSequence(String[] args) throws IOException,
 			TwitterException, IllegalStateException {
-		isUserActive = true;
-		while (isUserActive) {
 
+		while (isUserActive) {
 			switch (cVectors) {
+
 			case TSAK_GET_PARAMETERS_FROM_ENV_VAR:
 
 				readEnvVariable(args);
@@ -100,36 +96,42 @@ public class AppLauncher {
 				if (readFromENV) {
 					if (toBeVerifiedENV && !TwitterCredentials.getIsVerified()) {
 
-						verifyTwitterCredentials();
-						cRManager.printUserProfile(tAuth.getUser(), true);
-						cRManager.writeVerificationToConfFile(true);
-						TwitterCredentials.setIsVerified(true);
+						if (verifyTwitterCredentials()) {
+							cRManager.printUserProfile(tAuth.getUser(), true);
+							cRManager.writeVerificationToConfFile(true);
+							TwitterCredentials.setIsVerified(true);
+
+						}
+					} else {
+						cVectors = controlVectors.TSAK_TWITTER_GET_DUMP;
 					}
 				} else {
 
-					verifyTwitterCredentials();
-					cRManager.printUserProfile(tAuth.getUser(), true);
-					cRManager.writeVerificationToConfFile(true);
+					if (verifyTwitterCredentials()) {
+
+						cRManager.printUserProfile(tAuth.getUser(), true);
+
+						// cRManager.writeVerificationToConfFile(true);
+					}
 				}
-				cVectors = controlVectors.TSAK_TWITTER_GET_DUMP;
 				break;
 			case TSAK_TWITTER_GET_DUMP:
 				try {
-					System.out.println("DumptoFileFn");
-					System.out.println("1: "+scObj);
 					dumpToFile();
 					cVectors = controlVectors.TSAK_SYSTEM_EXIT_PHASE;
 				} catch (Exception e) {
 					cRManager.DisplayErrorMessage(e.getMessage(), true);
 					System.exit(-1);
 				}
-
 				break;
+
 			case TSAK_SYSTEM_EXIT_PHASE:
 				ddManager.closeWriter();
 				exitApp();
 				break;
+
 			default:
+				ddManager.closeWriter();
 				System.exit(-1);
 				break;
 			}
@@ -139,37 +141,50 @@ public class AppLauncher {
 
 	private void dumpToFile() throws IOException, IllegalStateException,
 			TsakException, TwitterException {
-		System.out.println("2: "+scObj);
+
 		if (scObj == subCmdUpVector.FLWRZ_DUMP_BY_ID) {
-			System.out.println("Now dumping followers...");
+
 			FFManager fmanager = new FFManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			
-			fmanager.dumpFFToFile(TwitterCredentials.getuID(), scObj);
+			ResponseList<User> flwrz = fmanager.dumpFFToFile(
+					TwitterCredentials.getuID(), scObj);
+
+			ddManager.userIteratorWriter(flwrz);
 
 		} else if (scObj == subCmdUpVector.FLWRZ_DUMP_BY_SCREEN_NAME) {
 
 			FFManager fmanager = new FFManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			fmanager.dumpFFToFile(TwitterCredentials.getuScreenName(), scObj);
+			ResponseList<User> flwrz = fmanager.dumpFFToFile(
+					TwitterCredentials.getuScreenName(), scObj);
+
+			ddManager.userIteratorWriter(flwrz);
 
 		} else if (scObj == subCmdUpVector.FRNDZ_DUMP_BY_ID) {
 
 			FFManager fmanager = new FFManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			fmanager.dumpFFToFile(TwitterCredentials.getuID(), scObj);
+			ResponseList<User> flwings = fmanager.dumpFFToFile(
+					TwitterCredentials.getuID(), scObj);
+
+			ddManager.userIteratorWriter(flwings);
 
 		} else if (scObj == subCmdUpVector.FRNDZ_DUMP_BY_SCREEN_NAME) {
 
 			FFManager fmanager = new FFManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			fmanager.dumpFFToFile(TwitterCredentials.getuScreenName(), scObj);
+			ResponseList<User> flwings = fmanager.dumpFFToFile(
+					TwitterCredentials.getuScreenName(), scObj);
+
+			ddManager.userIteratorWriter(flwings);
 
 		} else if (scObj == subCmdUpVector.HOME_TIMELINE) {
+
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
 			stmanager.userTimeLine(tAuth.getTwitterInstance().getScreenName(),
 					scObj);
+
 		} else if (scObj == subCmdUpVector.USER_TIMELINE) {
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
@@ -193,14 +208,16 @@ public class AppLauncher {
 			stmanager.getMentionsTimeline();
 
 		} else if (scObj == subCmdUpVector.SEARCH_TWEETS) {
-			SearchManager smanager = new SearchManager(
-					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			smanager.searchTweets(TwitterCredentials.getKeyWords());
-
+			
+			SearchManager smanager = new SearchManager(tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
+			List<String> tweets = smanager.searchTweets(TwitterCredentials.getKeyWords());
+			ddManager.listObjectWriter(tweets);
+			
 		} else if (scObj == subCmdUpVector.SEARCH_USER) {
 			SearchManager smanager = new SearchManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			smanager.searchUsers(TwitterCredentials.getKeyWords());
+			List<String> users = smanager.searchUsers(TwitterCredentials.getKeyWords());
+			ddManager.listObjectWriter(users);
 
 		} else if (scObj == subCmdUpVector.USERS_LOOKUP) {
 
@@ -212,17 +229,23 @@ public class AppLauncher {
 
 			AccountManager amanager = new AccountManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			amanager.getBlockList();
+			List<Object> blocklst = amanager.getBlockList();
 
+			ddManager.listObjectWriter(blocklst);
 		} else if (scObj == subCmdUpVector.SHOW_FRNDSHIP) {
+
 			FriendshipManager fmanager = new FriendshipManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			fmanager.showFriendsShip();
+			String frndship = fmanager.showFriendsShip();
+
+			ddManager.writeLine(frndship, true);
 
 		} else if (scObj == subCmdUpVector.FRIENDS_LIST) {
 			FriendshipManager fmanager = new FriendshipManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			fmanager.getFriendsList(scObj);
+			List<String> frndslist = fmanager.getFriendsList(scObj);
+			ddManager.listObjectWriter(frndslist);
+
 		} else if (scObj == subCmdUpVector.FOLLOWERS_LIST) {
 
 			FriendshipManager fmanager = new FriendshipManager(
@@ -233,8 +256,9 @@ public class AppLauncher {
 
 			AccountManager amanager = new AccountManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			amanager.getFavourities();
+			List<Map<String, Object>> fav = amanager.getFavourities();
 
+			ddManager.listMapsJsonWriter(fav);
 		} else if (scObj == subCmdUpVector.SUGGESTED_USER_CATS) {
 
 			UsersManager umanager = new UsersManager(
@@ -254,97 +278,132 @@ public class AppLauncher {
 
 			ListsManager lmanager = new ListsManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			lmanager.getUserLists();
+			List<String> ulists = lmanager.getUserLists();
+			ddManager.listObjectWriter(ulists);
+
 		} else if (scObj == subCmdUpVector.LIST_STATUSES) {
 
 			ListsManager lmanager = new ListsManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			lmanager.getListStatuses();
+			List<String> lstatuses = lmanager.getListStatuses();
+			ddManager.listObjectWriter(lstatuses);
+
 		} else if (scObj == subCmdUpVector.SAVED_SEARCHES) {
 
 			AccountManager amanager = new AccountManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			amanager.SavedSearches();
+			List<Object> savedsearches = amanager.SavedSearches();
+
+			ddManager.listObjectWriter(savedsearches);
 
 		} else if (scObj == subCmdUpVector.LOOKUP_FRNDSHIP) {
 
 			FriendshipManager fmanager = new FriendshipManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			fmanager.lookupFriendship();
+			List<String> lookupfrndshp = fmanager.lookupFriendship();
+			ddManager.listObjectWriter(lookupfrndshp);
+
 		} else if (scObj == subCmdUpVector.INCOMING_FRNDSHIP) {
 			FriendshipManager fmanager = new FriendshipManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			fmanager.iOFriendships(scObj);
+			List<Long> iofrndshp = fmanager.iOFriendships(scObj);
+			ddManager.listObjectWriter(iofrndshp);
 
 		} else if (scObj == subCmdUpVector.OUTGOING_FRNDSHIP) {
 			FriendshipManager fmanager = new FriendshipManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			fmanager.iOFriendships(scObj);
+			List<Long> iofrndshp = fmanager.iOFriendships(scObj);
+			ddManager.listObjectWriter(iofrndshp);
+
 		} else if (scObj == subCmdUpVector.GEO_DETAILS) {
 
 			GisManager gmanager = new GisManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			gmanager.getGeoLocationInfo();
+			String ginfo = gmanager.getGeoLocationInfo();
+			ddManager.writeLine(ginfo, true);
 
 		} else if (scObj == subCmdUpVector.SIMILAR_PLACES) {
 
 			GisManager gmanager = new GisManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			gmanager.getSimilarPlaces();
+			List<String> gsplaces = gmanager.getSimilarPlaces();
+			ddManager.listObjectWriter(gsplaces);
 
 		} else if (scObj == subCmdUpVector.SEARCH_PLACE_BY_CORD) {
 
 			GisManager gmanager = new GisManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			gmanager.searchPlace();
+			List<String> geosrchd = gmanager.searchPlace();
+			ddManager.listObjectWriter(geosrchd);
+
 		} else if (scObj == subCmdUpVector.ACCOUNT_SETTINGS) {
 
 			AccountManager amanager = new AccountManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			amanager.getAccountSettingsJson();
+			Map<String, Object> settings = amanager.getAccountSettingsJson();
+
+			ddManager.mapJsonWriter(settings);
+
 		} else if (scObj == subCmdUpVector.AVAILABLE_TRENDS) {
 
 			GisManager gmanager = new GisManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			gmanager.getAvalilableTrends();
+			List<String> trends = gmanager.getAvalilableTrends();
+			ddManager.listObjectWriter(trends);
+
 		} else if (scObj == subCmdUpVector.PLACE_TRENDS) {
 
 			GisManager gmanager = new GisManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			gmanager.getPlaceTrends();
+			List<String> ptrends = gmanager.getPlaceTrends();
+			ddManager.listObjectWriter(ptrends);
+
 		} else if (scObj == subCmdUpVector.CLOSEST_TRENDS) {
 
 			GisManager gmanager = new GisManager(tAuth.getTwitterInstance(),
 					ddManager, cRManager, lManager);
-			gmanager.getClosestTrends();
+			List<String> gCtrends = gmanager.getClosestTrends();
+			ddManager.listObjectWriter(gCtrends);
 
 		} else if (scObj == subCmdUpVector.MUTES_IDS) {
 
 			AccountManager amanager = new AccountManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			amanager.getMutesIds();
+			List<Object> ids = amanager.getMutesIds();
+
+			ddManager.listObjectWriter(ids);
+
 		} else if (scObj == subCmdUpVector.MUTES_LIST) {
 
 			AccountManager amanager = new AccountManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			amanager.getMutesLists();
+			List<Map<String, Object>> umutelists = amanager.getMutesLists();
+
+			ddManager.listMapsJsonWriter(umutelists);
+
 		} else if (scObj == subCmdUpVector.LISTS_MEMEBERSHIPS) {
 
 			AccountManager amanager = new AccountManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			amanager.userListMemberships();
+			List<Map<String, Object>> ulistmaps = amanager
+					.userListMemberships();
+
+			ddManager.listMapsJsonWriter(ulistmaps);
+
 		} else if (scObj == subCmdUpVector.LIST_SUBSCRIBERS
 				|| scObj == subCmdUpVector.LIST_MEMBERS) {
 
 			ListsManager lmanager = new ListsManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			lmanager.getUserListSubscribers(scObj);
+			List<String> ulsub = lmanager.getUserListSubscribers(scObj);
+			ddManager.listObjectWriter(ulsub);
 
 		} else if (scObj == subCmdUpVector.LIST_SUBSCRIPTIONS) {
 
 			ListsManager lmanager = new ListsManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			lmanager.UserListSubsciptions();
+			List<String> ulsub = lmanager.UserListSubsciptions();
+			ddManager.listObjectWriter(ulsub);
 
 		} else {
 
@@ -366,17 +425,15 @@ public class AppLauncher {
 	}
 
 	private void readEnvVariable(String[] args) {
-		
+
 		if (cRManager.getCredentialsFromENV()) {
-			
+
 			readFromENV = true;
 			if (!TwitterCredentials.getIsVerified()) {
 
 				toBeVerifiedENV = true;
 			}
-			
 			scObj = argManager.getCmdArgs(args, false);
-			
 		} else {
 
 			cRManager.DisplayInfoMessage(
@@ -409,8 +466,9 @@ public class AppLauncher {
 		isUserActive = false;
 	}
 
-	private void verifyTwitterCredentials() {
+	private boolean verifyTwitterCredentials() {
 
+		boolean verified = false;
 		cRManager.DisplayInfoMessage(
 				"[INFO]: Verifying Twitter Credentials.... ", false);
 		if (tAuth.verifyKeys()) {
@@ -420,15 +478,18 @@ public class AppLauncher {
 							"[INFO]: Saving Twitter Credentials for future use in conf.properties file.",
 							true);
 			cVectors = controlVectors.TSAK_TWITTER_GET_DUMP;
-
+			verified = true;
 		} else {
 
 			cRManager
 					.DisplayErrorMessage(
 							"FAILED\n[ERROR]: Failed to verify User Credentials.",
 							true);
+			verified = false;
 			cVectors = controlVectors.TSAK_SYSTEM_EXIT_PHASE;
 		}
+
+		return verified;
 	}
 
 }

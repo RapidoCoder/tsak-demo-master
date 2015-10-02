@@ -1,6 +1,8 @@
 package twitterhandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -25,6 +27,15 @@ public class ListsManager {
 	CrManager cRManager;
 	LimitsManager lManager;
 	Long timeStart = null, timeEnd = null;
+	private Paging page;
+	private ResponseList<Status> statuses ;
+	private Map<String, Object> listStatus;
+	
+	private List<String> lReturn;
+	private JSONObject jObj;
+	private ResponseList<UserList> userlist;
+	private PagableResponseList<User> users;
+	private PagableResponseList<UserList> lists;
 
 	public ListsManager(Twitter twtr, DDManager ddm, CrManager crm,
 			LimitsManager lmg) {
@@ -33,9 +44,10 @@ public class ListsManager {
 		cRManager = crm;
 		lManager = lmg;
 		twitter = twtr;
+		lReturn = new ArrayList<String>();
 	}
 
-	public void getListStatuses() throws TsakException {
+	public List<String> getListStatuses() throws TsakException {
 
 		int counter = 0;
 
@@ -64,17 +76,15 @@ public class ListsManager {
 
 			timeStart = System.currentTimeMillis();
 
-			Paging page = new Paging(1, 50);
-			ResponseList<Status> statuses;
-
+			page = new Paging(1, 50);
+			
 			do {
-
-				statuses = twitter.getUserListStatuses(
-						Long.parseLong(TwitterCredentials.getLid()), page);
+				
+				statuses = twitter.getUserListStatuses(Long.parseLong(TwitterCredentials.getLid()), page);
 
 				for (Status status : statuses) {
-
-					Map<String, Object> listStatus = new HashMap<String, Object>();
+					
+					listStatus = new HashMap<String, Object>();
 
 					listStatus.put("createdAt", status.getCreatedAt());
 					listStatus.put("id", status.getId());
@@ -89,11 +99,12 @@ public class ListsManager {
 					listStatus.put("user", status.getUser());
 					listStatus.put("geoLocation", status.getGeoLocation());
 
-					ddManager.writeLine(
-							(new JSONObject(listStatus)).toString(), true);
-
+					//ddManager.writeLine((new JSONObject(listStatus)).toString(), true);
 					counter++;
-
+					
+					jObj = new JSONObject(listStatus);
+					
+						lReturn.add(jObj.toString());	
 				}
 
 				page.setPage(page.getPage() + 1);
@@ -101,6 +112,10 @@ public class ListsManager {
 
 			timeEnd = System.currentTimeMillis();
 
+			if (lReturn.isEmpty()) {
+				return lReturn;
+			}
+			
 			cRManager.DisplayInfoMessage(
 					"[INFO]: " + counter
 							+ " List status/statuses dumped successfully to "
@@ -122,10 +137,12 @@ public class ListsManager {
 
 			cRManager.DisplayInfoMessage(
 					"[ERROR]: Wrong list id." + e.getMessage(), true);
-		}
+		} 
+		
+		return lReturn;
 	}
 
-	public void getUserLists() throws TsakException {
+	public List<String> getUserLists() throws TsakException {
 
 		cRManager.DisplayInfoMessage(
 				"[INFO]: Checking Rate Limits Availibity.", true);
@@ -152,8 +169,6 @@ public class ListsManager {
 
 			timeStart = System.currentTimeMillis();
 
-			ResponseList<UserList> userlist = null;
-
 			try {
 
 				userlist = twitter.getUserLists(Long
@@ -178,9 +193,10 @@ public class ListsManager {
 				listMap.put("description", list.getDescription());
 				listMap.put("slug", list.getSlug());
 
-				JSONObject json_user = new JSONObject(listMap);
-				ddManager.writeLine(json_user.toString(), true);
+				jObj = new JSONObject(listMap);
+				//ddManager.writeLine(jObj.toString(), true);
 
+				lReturn.add(jObj.toString());
 			}
 
 			timeEnd = System.currentTimeMillis();
@@ -195,9 +211,10 @@ public class ListsManager {
 			cRManager.DisplayInfoMessage(("[ERROR]: " + te.getMessage()), true);
 		}
 
+		return lReturn;
 	}
 
-	public void getUserListSubscribers(subCmdUpVector sbv) throws TsakException {
+	public List<String> getUserListSubscribers(subCmdUpVector sbv) throws TsakException {
 
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 		
@@ -243,8 +260,7 @@ public class ListsManager {
 			timeStart = System.currentTimeMillis();
 
 			long cursor = -1;
-			PagableResponseList<User> users = null;
-
+			
 			do {
 
 				if (sbv == subCmdUpVector.LIST_SUBSCRIBERS) {
@@ -269,8 +285,9 @@ public class ListsManager {
 					user.put("location", tuser.getLocation());
 					user.put("language", tuser.getLang());
 
-					JSONObject json_user = new JSONObject(user);
-					ddManager.writeLine(json_user.toString(), true);
+					jObj = new JSONObject(user);
+					//ddManager.writeLine(json_user.toString(), true);
+					lReturn.add(jObj.toString());
 					
 				}
 
@@ -289,9 +306,10 @@ public class ListsManager {
 			cRManager.DisplayInfoMessage(("[ERROR]: " + te.getMessage()), true);
 		}
 
+		return lReturn;
 	}
 	
-	public void UserListSubsciptions ()throws TsakException {
+	public List<String> UserListSubsciptions ()throws TsakException {
 			
 			cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 
@@ -317,7 +335,6 @@ public class ListsManager {
 				timeStart = System.currentTimeMillis();
 				
 				long cursor = -1;
-				PagableResponseList<UserList> lists = null;
 				
 				do {
 					
@@ -334,7 +351,10 @@ public class ListsManager {
 						lmap.put("description", list.getDescription());
 						lmap.put("uri", list.getURI());
 						
-						ddManager.writeLine((new JSONObject(lmap)).toString() , true);
+						jObj = new JSONObject(lmap);
+						lReturn.add(jObj.toString());
+
+						//ddManager.writeLine((new JSONObject(lmap)).toString() , true);
 					}
 					
 					cursor = lists.getNextCursor();
@@ -352,7 +372,7 @@ public class ListsManager {
 				cRManager.DisplayErrorMessage("[ERROR]: " + te.getMessage(), true);
 			}
 			
-		
+		return lReturn;
 	}
 
 }

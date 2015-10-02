@@ -29,7 +29,7 @@ public class AccountManager {
 	DDManager ddManager;
 	CrManager cRManager;
 	LimitsManager lManager;
-	Long timeStart= null, timeEnd= null;
+	Long timeStart = null, timeEnd = null;
 	PagableResponseList<UserList> lists;
 	IDs ids;
 	PagableResponseList<User> users;
@@ -37,11 +37,12 @@ public class AccountManager {
 	ResponseList<SavedSearch> savedSearches;
 	List<Status> statuses;
 	List<User> userslist;
-		
+	Paging page;
+	
 	List<Map<String, Object>> maplists_return;
 	List <Object> objlist_return;
 	Map<String, Object> mapObj_return;
-
+	
 	public AccountManager (Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg) {
 		
 		ddManager = ddm;
@@ -51,7 +52,6 @@ public class AccountManager {
 		maplists_return = new ArrayList<Map<String, Object>>();
 		objlist_return = new ArrayList<Object> ();
 		mapObj_return = new HashMap<String, Object>();
-
 	}
 	
 
@@ -90,11 +90,11 @@ public class AccountManager {
 
 					lists = twitter.getUserListMemberships(Long.parseLong(TwitterCredentials.getuID()),cursor);
 				} catch (ClassCastException e) {
-					
+
 					lists = twitter.getUserListMemberships(TwitterCredentials.getuScreenName(), cursor);
 
 				} catch (NumberFormatException e) {
-					
+
 					lists = twitter.getUserListMemberships(TwitterCredentials.getuScreenName(), cursor);
 				}
 				
@@ -107,7 +107,6 @@ public class AccountManager {
 					lmap.put("members_count", ulist.getMemberCount());
 					lmap.put("subscribers_count", ulist.getSubscriberCount());
 					lmap.put("description", ulist.getDescription());
-					
 					lmap.put("uri", ulist.getURI());
 					
 					maplists_return.add(lmap);
@@ -189,7 +188,7 @@ public class AccountManager {
 	
 	
 	public List<Map<String, Object>> getMutesLists() throws TsakException {
-		
+
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 
 		int lmts[] = cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -218,11 +217,11 @@ public class AccountManager {
 			do {
 				
 				users = twitter.getMutesList(cursor);
-				
+
 				for (User tuser : users) {
 					
 					Map<String, Object> user = new HashMap<String, Object>();
-					
+
 					user.put("screen_name", tuser.getScreenName());
 					user.put("name", tuser.getName());
 					user.put("id", tuser.getId());
@@ -303,15 +302,9 @@ public class AccountManager {
 
 			Location[] locations = settings.getTrendLocations();
 			List<String> loc = new ArrayList<String>();
-			loc = null;
-			
-			
 			for (Location location : locations) {
-				
 				loc.add(location.getName());
 			}
-			
-			
 			mapObj_return.put("locations", loc);
 
 			//json_settings = new JSONObject(mapObj_return);
@@ -414,27 +407,26 @@ public class AccountManager {
 			
 			timeStart = System.currentTimeMillis();
 
-			Paging page = new Paging(1,200);
-			
+
+			page = new Paging(1, 200);
 			do {
 				
 				statuses = twitter.getFavorites(page);
-				
 				for (Status status : statuses) {
-					
+
 					Map<String, Object> fav = new HashMap<String, Object>();
-					User user = status.getUser();
-					fav.put("name", user.getName());
+
+					fav.put("name", status.getUser().getName());
 					fav.put("screen_name", status.getUser().getScreenName());
 					fav.put("tweet", status.getText());
-					
+
 					maplists_return.add(fav);
 					//ddManager.writeLine((new JSONObject(fav)).toString(), true);
 				}
 
 				page.setPage(page.getPage() + 1);
 			} while (statuses.size() > 0 && page.getPage() < 14);
-              
+
 			timeEnd = System.currentTimeMillis();
 			cRManager.DisplayInfoMessage(
 					"[INFO]: Favourites dumped successfully to "
