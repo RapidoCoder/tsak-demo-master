@@ -76,7 +76,6 @@ public class TestFFManager {
 			Mockito.when(twitter .lookupUsers(followerIds.getIDs())).thenReturn(ffretrn);
 			
 			ResponseList<User> result = ffmanager.dumpFFToFile(tuser, sbv);
-			System.out.println(result);
 			assertEquals(result,ffretrn); 
 		}
 		// ////////////////////////
@@ -93,7 +92,6 @@ public class TestFFManager {
 					Mockito.when(twitter .lookupUsers(followerIds.getIDs())).thenReturn(ffretrn);
 					
 					ResponseList<User> result = ffmanager.dumpFFToFile(tuser, sbv);
-					System.out.println(result);
 					assertEquals(result,ffretrn); 
 				}	
 				
@@ -109,7 +107,6 @@ public class TestFFManager {
 					Mockito.when(twitter .lookupUsers(friendsIds.getIDs())).thenReturn(ffretrn);
 					
 					ResponseList<User> result = ffmanager.dumpFFToFile(tuser, sbv);
-					System.out.println(result);
 					assertEquals(result,ffretrn); 
 				}	
 				@Test
@@ -124,7 +121,6 @@ public class TestFFManager {
 					Mockito.when(twitter .lookupUsers(friendsIds.getIDs())).thenReturn(ffretrn);
 					
 					ResponseList<User> result = ffmanager.dumpFFToFile(tuser, sbv);
-					System.out.println(result);
 					assertEquals(result,ffretrn); 
 				}		
 }
