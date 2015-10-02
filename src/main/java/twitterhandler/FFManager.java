@@ -52,6 +52,7 @@ public class FFManager {
 				do {
 					
 					if (sbv == subCmdUpVector.FLWRZ_DUMP_BY_ID) {
+						
 						followerIds = twitter.getFollowersIDs(Long.parseLong(tuser) , cursor);
 					}else {
 						followerIds = twitter.getFollowersIDs(tuser, cursor);
@@ -75,6 +76,7 @@ public class FFManager {
 					timeStart = System.currentTimeMillis();
 					
 					ffretrn = twitter .lookupUsers(followerIds.getIDs());
+					
 					
 				} while ((cursor = followerIds.getNextCursor()) != 0);
 				

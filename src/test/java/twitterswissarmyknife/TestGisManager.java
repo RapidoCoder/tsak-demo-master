@@ -1,6 +1,6 @@
 package twitterswissarmyknife;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +19,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import twitter4j.GeoLocation;
 import twitter4j.GeoQuery;
+import twitter4j.JSONObject;
 import twitter4j.Location;
 import twitter4j.Place;
 import twitter4j.ResponseList;
