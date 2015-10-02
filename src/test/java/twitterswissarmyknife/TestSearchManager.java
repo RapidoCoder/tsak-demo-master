@@ -19,9 +19,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import twitter4j.GeoLocation;
 import twitter4j.JSONObject;
-import twitter4j.Place;
 import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.ResponseList;
@@ -29,7 +27,6 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
-import twitterhandler.GisManager;
 import twitterhandler.LimitsManager;
 import twitterhandler.SearchManager;
 import twitterhandler.TwitterCredentials;
@@ -59,6 +56,7 @@ public class TestSearchManager {
 	QueryResult results;
 	List<Status> tweets;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() {
 		cRManager = Mockito.mock(CrManager.class);

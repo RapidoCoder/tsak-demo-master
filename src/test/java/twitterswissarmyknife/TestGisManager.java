@@ -1,6 +1,6 @@
 package twitterswissarmyknife;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +59,7 @@ public class TestGisManager {
 	Trends trends;
 	Trend trend;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() {
 		twitter = Mockito.mock(Twitter.class);
