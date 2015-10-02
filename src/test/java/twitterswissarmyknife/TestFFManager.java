@@ -20,11 +20,11 @@ import twitterhandler.FFManager;
 import twitterhandler.LimitsManager;
 import twitterhandler.TwitterAuth;
 import twitterhandler.TwitterCredentials;
-import dto.CrManager;
-import dto.DDManager;
 import dto.ControlHandlers.LimitsEndPointsVector;
 import dto.ControlHandlers.controlVectors;
 import dto.ControlHandlers.subCmdUpVector;
+import dto.CrManager;
+import dto.DDManager;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ controlVectors.class, TwitterCredentials.class })
@@ -43,6 +43,7 @@ public class TestFFManager {
 	ResponseList<User> followings;
 	FFManager fmanager;
 	ResponseList<User> ffretrn;
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
 		cRManager = Mockito.mock(CrManager.class);

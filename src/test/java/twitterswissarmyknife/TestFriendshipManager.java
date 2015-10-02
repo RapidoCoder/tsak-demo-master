@@ -55,6 +55,7 @@ public class TestFriendshipManager {
 	ArgsManager argManager;
 	User user;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
 		twitter = Mockito.mock(Twitter.class);

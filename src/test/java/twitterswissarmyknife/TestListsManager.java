@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -79,6 +78,7 @@ public class TestListsManager {
 	ResponseList<UserList> userlists;
 	PagableResponseList<UserList> lists;
 	
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup(){
 		cRManager = Mockito.mock(CrManager.class);
@@ -118,7 +118,7 @@ public class TestListsManager {
 	
 	@Test
 	public void getListStatuses() throws TsakException, NumberFormatException, TwitterException{
-		Map expectedMap = new HashMap<String, Object>();
+		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("createdAt", null);
 		expectedMap.put("id", 1);
 		expectedMap.put("text", "some text");
@@ -163,7 +163,7 @@ public class TestListsManager {
 	
 	@Test
 	public void getUserLists() throws NumberFormatException, TwitterException, TsakException{
-		Map expectedMap = new HashMap<String, Object>();
+		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("id", 1L);
 		expectedMap.put("description", "description");
 		expectedMap.put("name", "name");
@@ -194,7 +194,7 @@ public class TestListsManager {
 	
 	@Test
 	public void getUserListSubscribers() throws TsakException, NumberFormatException, TwitterException{
-		Map expectedMap = new HashMap<String, Object>();
+		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("id", 1L);
 		expectedMap.put("location", "location");
 		expectedMap.put("profile_image", "url");
@@ -235,7 +235,7 @@ public class TestListsManager {
 	}
 	@Test
 	public void getUserListSubscribersByMembers() throws TsakException, NumberFormatException, TwitterException{
-		Map expectedMap = new HashMap<String, Object>();
+		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("id", 1L);
 		expectedMap.put("location", "location");
 		expectedMap.put("profile_image", "url");
@@ -277,7 +277,7 @@ public class TestListsManager {
 	@Test
 	public void UserListSubsciptions() throws TsakException, TwitterException, URISyntaxException{
 		URI uri = new URI("www.google.com");
-		Map expectedMap = new HashMap<String, Object>();
+		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("id", 1L);
 		expectedMap.put("members_count", 1);
 		expectedMap.put("description", "description");

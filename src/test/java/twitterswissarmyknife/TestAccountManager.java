@@ -74,6 +74,7 @@ public class TestAccountManager {
 	User tuser;
 	Iterator<User> userIterator;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
 		list = Mockito.mock(UserList.class);
@@ -220,52 +221,6 @@ public class TestAccountManager {
 		assertEquals(result, expected);
 	}
 
-	// @Test
-	// public void getAccountSettingsJson() throws TwitterException,
-	// TsakException{
-	// int lmts[] = { 15, 1000 };
-	// Map<String, Object> expected = new HashMap<String, Object>();
-	// List<String> loc = new ArrayList<String>();
-	//
-	// expected.put("time_zone", null);
-	// expected.put("access_level", 1L);
-	// expected.put("locations" ,locations);
-	// expected.put("geo_enabled", true);
-	// expected.put("sleep_end_enabled", 100);
-	// expected.put("screen_name", "screen_name");
-	// expected.put("language", "english");
-	// expected.put(" email_discoverable", true);
-	// expected.put(" uses_https_always", true);
-	// expected.put(" sleep_start_enabled", 100);
-	// expected.put(" sleep_time_enabled", false);
-	// twitter4j.TimeZone timeZone = settings.getTimeZone();
-	//
-	// Mockito.when(cRManager.rateLimitAnalyzer(twitter, lManager,
-	// LimitsEndPointsVector.ACCOUNT_SETTINGS)).thenReturn(lmts);
-	// Mockito.when(twitter.getAccountSettings()).thenReturn(settings);
-	//
-	// Mockito.when(settings.getScreenName()).thenReturn("screen_name");
-	// Mockito.when(settings.isSleepTimeEnabled()).thenReturn(false);
-	// Mockito.when(settings.getSleepEndTime()).thenReturn("100");
-	// Mockito.when(settings.getSleepStartTime()).thenReturn("100");
-	// Mockito.when( settings.isGeoEnabled()).thenReturn(true);
-	// Mockito.when(settings.isDiscoverableByEmail()).thenReturn(true);
-	// Mockito.when(settings.isAlwaysUseHttps()).thenReturn(true);
-	// Mockito.when(settings.getAccessLevel()).thenReturn(1);
-	// Mockito.when(settings.getLanguage()).thenReturn("english");
-	//
-	//
-	// Mockito.when(settings.getTrendLocations()).thenReturn(locations);
-	// // Mockito.when(location.getName()).thenReturn("some location");
-	// // Mockito.when( settings.getTimeZone()).thenReturn( timeZone);
-	//
-	// AccountManager accountManager = new AccountManager(twitter, ddManager ,
-	// cRManager, lManager);
-	// Map<String, Object> result = accountManager.getAccountSettingsJson();
-	// //assertEquals(result, expected);
-	// System.out.println(result);
-	// }
-
 	@Test
 	public void SavedSearches() throws TwitterException, TsakException {
 		int lmts[] = { 15, 1000 };
@@ -328,7 +283,7 @@ public class TestAccountManager {
 	}
 	@Test
 	public void getBlockList() throws TsakException, TwitterException{
-		int lmts[] = { 15, 1000 };
+		
 		List<Object> expected = new ArrayList<Object>();
 		expected.add("1\t@some screen name");
 		Mockito.when(
