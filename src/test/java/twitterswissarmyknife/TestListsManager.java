@@ -118,6 +118,7 @@ public class TestListsManager {
 	
 	@Test
 	public void getListStatuses() throws TsakException, NumberFormatException, TwitterException{
+		
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("createdAt", null);
 		expectedMap.put("id", 1);

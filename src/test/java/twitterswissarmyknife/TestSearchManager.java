@@ -107,8 +107,8 @@ public class TestSearchManager {
 		Mockito.when(userIterator.next()).thenReturn(tuser);
 		Mockito.when(users.iterator()).thenReturn(userIterator);
 
-		Mockito.when(tuser.getScreenName()).thenReturn("some screen name");
-		Mockito.when(tuser.getName()).thenReturn("some name");
+		Mockito.when(tuser.getScreenName()).thenReturn("userScreenName");
+		Mockito.when(tuser.getName()).thenReturn("userName");
 		Mockito.when(tuser.getId()).thenReturn(1L);
 		Mockito.when(tuser.getBiggerProfileImageURL()).thenReturn(
 				"profile image");
