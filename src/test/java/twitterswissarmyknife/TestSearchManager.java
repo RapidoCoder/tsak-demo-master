@@ -81,13 +81,13 @@ public class TestSearchManager {
 	public void searchUsers() throws TwitterException, TsakException {
 
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
-		expectedMap.put("screen_name", "some screen name");
-		expectedMap.put("name", "some name");
+		expectedMap.put("screen_name", "userScreenName");
+		expectedMap.put("name", "userName");
 		expectedMap.put("id", 1L);
-		expectedMap.put("profile_image", "profile image");
+		expectedMap.put("profile_image", "http://someImageUrl.com");
 		expectedMap.put("friends_count", 10);
 		expectedMap.put("followers_count", 20);
-		expectedMap.put("location", "some location");
+		expectedMap.put("location", "london");
 		expectedMap.put("language", "english");
 		JSONObject expectedJson = new JSONObject(expectedMap);
 
@@ -111,10 +111,10 @@ public class TestSearchManager {
 		Mockito.when(tuser.getName()).thenReturn("userName");
 		Mockito.when(tuser.getId()).thenReturn(1L);
 		Mockito.when(tuser.getBiggerProfileImageURL()).thenReturn(
-				"profile image");
+				"http://someImageUrl.com");
 		Mockito.when(tuser.getFriendsCount()).thenReturn(10);
 		Mockito.when(tuser.getFollowersCount()).thenReturn(20);
-		Mockito.when(tuser.getLocation()).thenReturn("some location");
+		Mockito.when(tuser.getLocation()).thenReturn("london");
 		Mockito.when(tuser.getLang()).thenReturn("english");
 
 		SearchManager searcManager = new SearchManager(twitter, ddManager,
@@ -129,10 +129,10 @@ public class TestSearchManager {
 		Map<String, String> expectedMap = new HashMap<String, String>();
 		Map<String, Object> expected = new HashMap<String, Object>();
 
-		expectedMap.put("Name", "Some Name");
-		expectedMap.put("Screen_name", "Some Screen name");
+		expectedMap.put("Name", "userName");
+		expectedMap.put("Screen_name", "userScreenName");
 		expectedMap.put("ID", "123");
-		expectedMap.put("Location", "Some Location");
+		expectedMap.put("Location", "london");
 		expectedMap.put("imageURL", "http://someImageUrl.com");
 		expectedMap.put("URL", "http://someurl.com");
 		expectedMap.put("FriendsCount", "10");
@@ -159,10 +159,10 @@ public class TestSearchManager {
 		Mockito.when(tweets.iterator()).thenReturn(tweetIterator);
 		Mockito.when(tweet.getUser()).thenReturn(tuser);
 		
-		Mockito.when(tuser.getName()).thenReturn("Some Name");
-		Mockito.when(tuser.getScreenName()).thenReturn("Some Screen name");
+		Mockito.when(tuser.getName()).thenReturn("userName");
+		Mockito.when(tuser.getScreenName()).thenReturn("userScreenName");
 		Mockito.when(tuser.getId()).thenReturn(123L);
-		Mockito.when(tuser.getLocation()).thenReturn("Some Location");
+		Mockito.when(tuser.getLocation()).thenReturn("london");
 		Mockito.when(tuser.getOriginalProfileImageURL()).thenReturn("http://someImageUrl.com");
 		Mockito.when(tuser.getURL()).thenReturn("http://someurl.com");
 		Mockito.when(tuser.getFriendsCount()).thenReturn(10);
