@@ -27,7 +27,7 @@ import dto.CrManager;
 import dto.DDManager;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
+@PrepareForTest({ FFManager.class, controlVectors.class, TwitterCredentials.class })
 public class TestFFManager {
 	@Mock
 	CrManager cRManager;

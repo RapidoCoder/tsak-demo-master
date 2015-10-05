@@ -39,7 +39,7 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
+@PrepareForTest({AccountManager.class,Paging.class, controlVectors.class, TwitterCredentials.class })
 public class TestAccountManager {
 
 	@Mock
@@ -48,7 +48,7 @@ public class TestAccountManager {
 	CrManager cRManager;
 	LimitsManager lManager;
 	LimitsEndPointsVector limitVecotr;
-	// Location location;
+	Paging page;
 	PagableResponseList<UserList> lists;
 	IDs ids;
 
@@ -98,7 +98,7 @@ public class TestAccountManager {
 		statuses = Mockito.mock(ResponseList.class);
 		
 		maplists_return = Mockito.mock(List.class);
-		// locations = Mockito.mock(Location[].class);
+		page = Mockito.mock(Paging.class);
 
 		tuser = Mockito.mock(User.class);
 		users = Mockito.mock(PagableResponseList.class);
@@ -265,7 +265,8 @@ public class TestAccountManager {
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.FAVORITES_LIST)).thenReturn(lmts);
-		Paging page = new Paging(1,200);
+
+		PowerMockito.whenNew(Paging.class).withArguments(1,200).thenReturn(page);
 		Mockito.when(twitter.getFavorites(page)).thenReturn(statuses);
 
 		Mockito.when(statusIterator.hasNext()).thenReturn(true, false);

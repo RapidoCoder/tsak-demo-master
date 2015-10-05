@@ -19,15 +19,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import twitter4j.Category;
-import twitter4j.HashtagEntity;
-import twitter4j.MediaEntity;
-import twitter4j.PagableResponseList;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
-import twitter4j.UserMentionEntity;
 import twitterhandler.LimitsManager;
 import twitterhandler.TwitterCredentials;
 import twitterhandler.UsersManager;
@@ -38,7 +34,7 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
+@PrepareForTest({UsersManager.class, controlVectors.class, TwitterCredentials.class })
 public class TestUsersManager {
 
 	@Mock
@@ -46,6 +42,7 @@ public class TestUsersManager {
 	DDManager ddManager;
 	CrManager cRManager;
 	LimitsManager lManager;
+	@SuppressWarnings("rawtypes")
 	Iterator catIterator;
 	Status status;
 	ResponseList<Category> categories;
@@ -55,6 +52,7 @@ public class TestUsersManager {
 	Iterator<User> userIterator;
 	
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() {
 		twitter = Mockito.mock(Twitter.class);
@@ -71,6 +69,7 @@ public class TestUsersManager {
 		userIterator = Mockito.mock(Iterator.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void getSuggestedCatagories() throws TwitterException, TsakException {
 
@@ -94,10 +93,9 @@ public class TestUsersManager {
 		Mockito.when(category.getSize()).thenReturn(10);
 		
 		UsersManager usersManager = new UsersManager(twitter, ddManager, cRManager, lManager);
-
 		List<String> result = usersManager.getSuggestedCatagories();
-		
 		assertEquals(result, expected);
+
 	}
 	
 	@Test

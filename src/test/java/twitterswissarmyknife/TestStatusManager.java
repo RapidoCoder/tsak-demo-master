@@ -2,7 +2,6 @@ package twitterswissarmyknife;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +38,7 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
+@PrepareForTest({ StatusesManager.class, controlVectors.class, TwitterCredentials.class, Paging.class })
 public class TestStatusManager {
 	@Mock
 	CrManager cRManager;
@@ -53,7 +52,9 @@ public class TestStatusManager {
 	Iterator<Status> statusIterator;
 	User user;
 	IDs ids;
+	Paging page;
      
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() {
 		cRManager = Mockito.mock(CrManager.class);
@@ -69,6 +70,7 @@ public class TestStatusManager {
 		ids = Mockito.mock(IDs.class);
 		statuses = Mockito.mock(ResponseList.class);
 		statusIterator = Mockito.mock(Iterator.class);
+		page = Mockito.mock(Paging.class);
 	}
 
 	@Test
@@ -110,8 +112,9 @@ public class TestStatusManager {
 	}
 	
 	@Test
-	public void getMentionsTimeline() throws TwitterException, TsakException{
-		Paging page = new Paging(1, 200);
+	public void getMentionsTimeline() throws Exception{
+		
+		PowerMockito.whenNew(Paging.class).withArguments(1, 200).thenReturn(page);
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		Map<String, Object> tweet = new HashMap<String, Object>();
 		Map<String, Object> userMap = new HashMap<String, Object>();
@@ -141,7 +144,6 @@ public class TestStatusManager {
 		
 		
 		int lmts[] = { 15, 1000 };
-		String sID = "1";
 		Mockito.when(
 				 cRManager.rateLimitAnalyzer(twitter, lManager,LimitsEndPointsVector.STATUSES_MENTIONS_TIMELINE)).thenReturn(
 				lmts);
@@ -178,8 +180,8 @@ public class TestStatusManager {
 	}
 	
 	@Test
-	public void userTimeLineHOME_TIMELINE() throws FileNotFoundException, TsakException, TwitterException{
-		Paging page = new Paging(1, 200);
+	public void userTimeLineHOME_TIMELINE() throws Exception{
+		PowerMockito.whenNew(Paging.class).withArguments(1, 200).thenReturn(page);
 		List<String> expected = new ArrayList<String>();
 		expected.add(1L +"\ttext");
 		String tuser = "123";
@@ -206,8 +208,8 @@ public class TestStatusManager {
 	
 
 	@Test
-	public void userTimeLineUSER_TIMELINE() throws TwitterException, FileNotFoundException, TsakException{
-		Paging page = new Paging(1, 200);
+	public void userTimeLineUSER_TIMELINE() throws Exception{
+		PowerMockito.whenNew(Paging.class).withArguments(1, 200).thenReturn(page);
 		List<String> expected = new ArrayList<String>();
 		expected.add("text");
 		String tuser = "123";
@@ -233,8 +235,8 @@ public class TestStatusManager {
 		 assertEquals(result, expected);
 	}
 	@Test
-	public void userTimeLineOWN_RETWEETS() throws TwitterException, FileNotFoundException, TsakException{
-		Paging page = new Paging(1, 100);
+	public void userTimeLineOWN_RETWEETS() throws Exception{
+		PowerMockito.whenNew(Paging.class).withArguments(1, 100).thenReturn(page);
 		List<String> expected = new ArrayList<String>();
 		expected.add("text");
 		String tuser = "123";

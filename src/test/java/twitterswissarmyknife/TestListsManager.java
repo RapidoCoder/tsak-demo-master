@@ -47,7 +47,7 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class})
+@PrepareForTest({ListsManager.class, controlVectors.class, TwitterCredentials.class, Paging.class})
 public class TestListsManager {
 	@Mock
 	CrManager cRManager;
@@ -77,7 +77,7 @@ public class TestListsManager {
 	Iterator<UserList> userlistIterator;
 	ResponseList<UserList> userlists;
 	PagableResponseList<UserList> lists;
-	
+	Paging page;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup(){
@@ -110,6 +110,8 @@ public class TestListsManager {
 		statusIterator = Mockito.mock(Iterator.class);
 		date = Mockito.mock(Date.class);
 		
+		page = Mockito.mock(Paging.class);
+		
 		
 		
 		
@@ -117,7 +119,7 @@ public class TestListsManager {
 	
 	
 	@Test
-	public void getListStatuses() throws TsakException, NumberFormatException, TwitterException{
+	public void getListStatuses() throws Exception{
 		
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("createdAt", null);
@@ -132,7 +134,8 @@ public class TestListsManager {
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		Paging page = new Paging(1, 50);
+		//Paging page = new Paging(1, 50);
+		PowerMockito.whenNew(Paging.class).withArguments(1, 50).thenReturn(page);
 		int lmts[] = { 15, 1000 };
 		Mockito.when( cRManager.rateLimitAnalyzer(twitter, lManager,
 				LimitsEndPointsVector.LISTS_STATUSES)).thenReturn(lmts);

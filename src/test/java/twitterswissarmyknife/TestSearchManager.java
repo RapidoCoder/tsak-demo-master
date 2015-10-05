@@ -37,7 +37,7 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
+@PrepareForTest({ SearchManager.class, controlVectors.class, TwitterCredentials.class })
 public class TestSearchManager {
 
 	@Mock

@@ -37,15 +37,16 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ controlVectors.class, TwitterCredentials.class,
-		GeoLocation.class})
+@PrepareForTest({GisManager.class, controlVectors.class, TwitterCredentials.class,
+		GeoLocation.class, GeoQuery.class})
 public class TestGisManager {
 	@Mock
 	Twitter twitter;
 	DDManager ddManager;
 	CrManager cRManager;
 	LimitsManager lManager;
-
+	GeoLocation geoLocation;
+	GeoQuery geoQuery;
 	Place place;
 	ResponseList<Place> places;
 	Iterator<Place> placeIterator;
@@ -67,11 +68,11 @@ public class TestGisManager {
 		lManager = Mockito.mock(LimitsManager.class);
 		ddManager = Mockito.mock(DDManager.class);
 		PowerMockito.mockStatic(TwitterCredentials.class);
-
+		geoQuery = Mockito.mock(GeoQuery.class);
 		places = Mockito.mock(ResponseList.class);
 		place = Mockito.mock(Place.class);
 		placeIterator = Mockito.mock(Iterator.class);
-
+		geoLocation = Mockito.mock(GeoLocation.class);
 		locations = Mockito.mock(ResponseList.class);
 		location = Mockito.mock(Location.class);
 		locationIterator = Mockito.mock(Iterator.class);
@@ -106,9 +107,8 @@ public class TestGisManager {
 				lmts);
 		Mockito.when(TwitterCredentials.getLatitude()).thenReturn("38.9047");
 		Mockito.when(TwitterCredentials.getLongitude()).thenReturn("77.0164");
-		GeoLocation geoLocation = new GeoLocation(
-				Double.parseDouble("38.9047"), Double.parseDouble("77.0164"));
-
+		PowerMockito.whenNew(GeoLocation.class).withArguments(Double.parseDouble("38.9047"),
+				Double.parseDouble("77.0164")).thenReturn(geoLocation);
 		Mockito.when(TwitterCredentials.getPlaceName()).thenReturn(name);
 		Mockito.when(twitter.getSimilarPlaces(geoLocation, name, null, null))
 				.thenReturn(places);
@@ -172,7 +172,7 @@ public class TestGisManager {
 	}
 
 	@Test
-	public void searchPlace() throws TwitterException, TsakException {
+	public void searchPlace() throws Exception {
 
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("id", "1");
@@ -193,9 +193,10 @@ public class TestGisManager {
 
 		Mockito.when(TwitterCredentials.getLatitude()).thenReturn("38.9047");
 		Mockito.when(TwitterCredentials.getLongitude()).thenReturn("77.0164");
-		GeoQuery query = new GeoQuery(new GeoLocation(
-				Double.parseDouble("38.9047"), Double.parseDouble("77.0164")));
-		Mockito.when(twitter.searchPlaces(query)).thenReturn(places);
+		
+		PowerMockito.whenNew(GeoLocation.class).withArguments(Double.parseDouble("38.9047"), Double.parseDouble("77.0164") ).thenReturn(geoLocation);
+		PowerMockito.whenNew(GeoQuery.class).withArguments(geoLocation ).thenReturn(geoQuery);
+		Mockito.when(twitter.searchPlaces(geoQuery)).thenReturn(places);
 		Mockito.when(places.size()).thenReturn(1);
 		Mockito.when(placeIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(placeIterator.next()).thenReturn(place);
@@ -291,7 +292,7 @@ public class TestGisManager {
 	}
 	
 	@Test
-	public void getClosestTrends() throws TwitterException, TsakException{
+	public void getClosestTrends() throws NumberFormatException, Exception{
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		Map<String, Object> type = new HashMap<String, Object>();
 		type.put("place_code", 123);
@@ -313,8 +314,8 @@ public class TestGisManager {
 				lmts);
 		Mockito.when(TwitterCredentials.getLatitude()).thenReturn("38.9047");
 		Mockito.when(TwitterCredentials.getLongitude()).thenReturn("77.0164");
-		GeoLocation geoLocation = new GeoLocation(
-				Double.parseDouble("38.9047"), Double.parseDouble("77.0164"));
+
+		PowerMockito.whenNew(GeoLocation.class).withArguments(Double.parseDouble("38.9047"), Double.parseDouble("77.0164") ).thenReturn(geoLocation);
 		Mockito.when(twitter.getClosestTrends(geoLocation)).thenReturn(locations);
 		Mockito.when(locationIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(locationIterator.next()).thenReturn(location);
