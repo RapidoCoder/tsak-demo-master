@@ -96,7 +96,6 @@ public class DDManager {
 	public void listObjectWriter (List<? extends Object> lists) {
 		
 		for (Object obj : lists) {
-			
 			writeLine(obj.toString() , true);
 		}	
 	}

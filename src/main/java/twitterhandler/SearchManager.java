@@ -77,7 +77,9 @@ public class SearchManager {
 			do {
 				users = twitter.searchUsers(keywords,page);
 				for (User tuser : users) {
+					
 					user = new HashMap<String, Object>();
+
 					user.put("screen_name", tuser.getScreenName());
 					user.put("name", tuser.getName());
 					user.put("id", tuser.getId());

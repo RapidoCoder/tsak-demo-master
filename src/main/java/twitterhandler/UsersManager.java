@@ -32,6 +32,17 @@ public class UsersManager {
 	CrManager cRManager;
 	LimitsManager lManager;
 	Long timeStart= null, timeEnd= null;
+	private ResponseList<Category> categories;
+	
+	private List<String> umReturn;
+	private ResponseList<User> users;
+	private Map<String, Object> userMap;
+	private JSONObject jObj;
+	private BufferedReader bReader;
+	private List<String> screenNames;
+	private List<Long> ids;
+	private ResponseList<User> usersByScreenName;
+	private ResponseList<User> usersByIDs;
 	
 	public UsersManager(Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg) {
 		
@@ -39,10 +50,11 @@ public class UsersManager {
 		cRManager = crm;
 		lManager = lmg;
 		twitter = twtr;
+		umReturn = new ArrayList<String>();
 	}
 	
 	
-	public void getSuggestedCatagories() throws TsakException {
+	public List<String> getSuggestedCatagories() throws TsakException {
 
 		long timeStart = 0, timeEnd = 0;
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
@@ -68,12 +80,14 @@ public class UsersManager {
 			
 			timeStart = System.currentTimeMillis();
 
-			ResponseList<Category> categories = twitter
+			categories = twitter
 					.getSuggestedUserCategories();
 
 			for (Category category : categories) {
-				ddManager.writeLine(category.getName() + " \t " + category.getSlug()
-						+ " \t " + category.getSize(), true);
+				
+				umReturn.add(category.getName() + " \t " + category.getSlug()+ " \t " + category.getSize());
+				//ddManager.writeLine(category.getName() + " \t " + category.getSlug()
+				//		+ " \t " + category.getSize(), true);
 			}
 
 			timeEnd = System.currentTimeMillis();
@@ -87,9 +101,11 @@ public class UsersManager {
 
 			cRManager.DisplayInfoMessage("[ERROR]: " + te.getMessage(),true);
 		}
+		
+		return umReturn;
 	}
 
-	public void getUserSuggestions(String slug) throws TsakException {
+	public List<String> getUserSuggestions(String slug) throws TsakException {
 
 		long timeStart = 0, timeEnd = 0;
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
@@ -115,10 +131,10 @@ public class UsersManager {
 
 			timeStart = System.currentTimeMillis();
 
-			ResponseList<User> users = twitter.getUserSuggestions(slug);
+			users = twitter.getUserSuggestions(slug);
 			for (User user : users) {
 
-				Map<String, Object> userMap = new HashMap<String, Object>();
+				userMap = new HashMap<String, Object>();
 				userMap.put("screen_name", user.getScreenName());
 				userMap.put("name", user.getName());
 				userMap.put("id", user.getId());
@@ -128,9 +144,10 @@ public class UsersManager {
 				userMap.put("location", user.getLocation());
 				userMap.put("language", user.getLang());
 
-				JSONObject json_user = new JSONObject(userMap);
+				jObj = new JSONObject(userMap);
 
-				ddManager.writeLine(json_user.toString(),true);
+				umReturn.add(jObj.toString());
+				//ddManager.writeLine(jObj.toString(),true);
 
 			}
 
@@ -146,9 +163,10 @@ public class UsersManager {
 			cRManager.DisplayInfoMessage("[ERROR]: " + te.getMessage(), true);
 		}
 
+		return umReturn;
 	}
 	
-	public void getMemberSuggestions(String slug) throws TsakException  {
+	public List<String> getMemberSuggestions(String slug) throws TsakException  {
 
 		long timeStart = 0, timeEnd = 0;
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
@@ -174,10 +192,10 @@ public class UsersManager {
 			
 			timeStart = System.currentTimeMillis();
 
-			ResponseList<User> users = twitter.getMemberSuggestions(slug);
+			users = twitter.getMemberSuggestions(slug);
 
 			for (User user : users) {
-				Map<String, Object> userMap = new HashMap<String, Object>();
+				userMap = new HashMap<String, Object>();
 
 				if (user.getStatus() != null) {
 					userMap.put("status", user.getStatus().getText());
@@ -194,8 +212,10 @@ public class UsersManager {
 				userMap.put("location", user.getLocation());
 				userMap.put("language", user.getLang());
 
-				JSONObject json_mem = new JSONObject(userMap);
-				ddManager.writeLine(json_mem.toString(), true);
+				jObj = new JSONObject(userMap);
+				umReturn.add(jObj.toString());
+				
+				//ddManager.writeLine(jObj.toString(), true);
 			}
 
 			timeEnd = System.currentTimeMillis();
@@ -209,13 +229,12 @@ public class UsersManager {
 
 			cRManager.DisplayInfoMessage("[ERROR]: " + te.getMessage(), true);
 		}
-
+		
+		return umReturn;
 	}
 
 	
-	public void lookupUsers(String file) throws TsakException, IOException {
-
-		BufferedReader bReader = null;
+	public List<String> lookupUsers(String file) throws TsakException, IOException {
 
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 
@@ -242,8 +261,8 @@ public class UsersManager {
 			bReader = new BufferedReader(new FileReader(new File(file)));
 
 			String line;
-			List<String> screenNames = new ArrayList<String>();
-			List<Long> ids = new ArrayList<Long>();
+			screenNames = new ArrayList<String>();
+			ids = new ArrayList<Long>();
 
 			while ((line = bReader.readLine()) != null) {
 
@@ -276,19 +295,22 @@ public class UsersManager {
 					String[] stringArray = Arrays.copyOf(screenNames.toArray(),
 							screenNames.size(), String[].class);
 
-					ResponseList<User> usersByScreenName = twitter
+					usersByScreenName = twitter
 							.lookupUsers(stringArray);
 
 					// dump now
 					for (User user : usersByScreenName) {
 
 						if (user.getStatus() != null) {
-							ddManager.writeLine("@" + user.getScreenName() + " - "
-									+ user.getStatus().getText(), true);
+							
+							umReturn.add("@" + user.getScreenName() + " - "+ user.getStatus().getText());
+//							ddManager.writeLine("@" + user.getScreenName() + " - "
+//									+ user.getStatus().getText(), true);
 
 						} else {
-							ddManager.writeLine("@" + user.getScreenName()
-									+ " status is Private.", true);
+							umReturn.add("@" + user.getScreenName()+ " status is Private.");
+//							ddManager.writeLine("@" + user.getScreenName()
+//									+ " status is Private.", true);
 						}
 					}
 
@@ -303,18 +325,23 @@ public class UsersManager {
 				String[] stringArray = Arrays.copyOf(screenNames.toArray(),
 						screenNames.size(), String[].class);
 
-				ResponseList<User> usersByScreenName = twitter
+				usersByScreenName = twitter
 						.lookupUsers(stringArray);
 
 				// dump to file
 				for (User user : usersByScreenName) {
 
 					if (user.getStatus() != null) {
-						ddManager.writeLine("@" + user.getScreenName() + " - "
-								+ user.getStatus().getText(), true);
+						umReturn.add("@" + user.getScreenName() + " - "+ user.getStatus().getText());
+
+//						ddManager.writeLine("@" + user.getScreenName() + " - "
+//								+ user.getStatus().getText(), true);
 					} else {
-						ddManager.writeLine("@" + user.getScreenName()
-								+ " status is Private.", true);
+						
+						umReturn.add("@" + user.getScreenName()+ " status is Private.");
+						
+//						ddManager.writeLine("@" + user.getScreenName()
+//								+ " status is Private.", true);
 					}
 				}
 
@@ -336,18 +363,22 @@ public class UsersManager {
 						page[j] = idsLong[counter++];
 					}
 
-					ResponseList<User> usersByIDs = twitter
+					usersByIDs = twitter
 							.lookupUsers(ArrayUtils.toPrimitive(page));
 
 					// dump now
 					for (User user : usersByIDs) {
 
 						if (user.getStatus() != null) {
-							ddManager.writeLine("@" + user.getScreenName() + " - "
-									+ user.getStatus().getText(), true);
+							umReturn.add("@" + user.getScreenName() + " - "+ user.getStatus().getText());
+
+//							ddManager.writeLine("@" + user.getScreenName() + " - "
+//									+ user.getStatus().getText(), true);
 						} else {
-							ddManager.writeLine("@" + user.getScreenName()
-									+ " status is Private.", true);
+							umReturn.add("@" + user.getScreenName()+ " status is Private.");
+							
+//							ddManager.writeLine("@" + user.getScreenName()
+//									+ " status is Private.", true);
 						}
 					}
 
@@ -359,18 +390,21 @@ public class UsersManager {
 					page[k] = idsLong[counter++];
 				}
 
-				ResponseList<User> usersByIDs = twitter.lookupUsers(ArrayUtils
+				usersByIDs = twitter.lookupUsers(ArrayUtils
 						.toPrimitive(page));
 
 				// dump to file
 				for (User user : usersByIDs) {
 
 					if (user.getStatus() != null) {
-						ddManager.writeLine("@" + user.getScreenName() + " - "
-								+ user.getStatus().getText(), true);
+						umReturn.add("@" + user.getScreenName() + " - "+ user.getStatus().getText());
+
+//						ddManager.writeLine("@" + user.getScreenName() + " - "
+//								+ user.getStatus().getText(), true);
 					} else {
-						ddManager.writeLine("@" + user.getScreenName()
-								+ " status is Private.", true);
+						umReturn.add("@" + user.getScreenName()+ " status is Private.");
+//						ddManager.writeLine("@" + user.getScreenName()
+//								+ " status is Private.", true);
 					}
 				}
 
@@ -391,6 +425,8 @@ public class UsersManager {
 		} finally {
 			bReader.close();
 		}
+		
+		return umReturn;
 	}
 	
 	

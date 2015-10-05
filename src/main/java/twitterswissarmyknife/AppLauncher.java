@@ -182,31 +182,41 @@ public class AppLauncher {
 
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			stmanager.userTimeLine(tAuth.getTwitterInstance().getScreenName(),
+			List<String> utimeline = stmanager.userTimeLine(tAuth.getTwitterInstance().getScreenName(),
 					scObj);
+			ddManager.listObjectWriter(utimeline);
 
 		} else if (scObj == subCmdUpVector.USER_TIMELINE) {
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			stmanager.userTimeLine(null, scObj);
+			List<String> utimeline = stmanager.userTimeLine(null, scObj);
+			ddManager.listObjectWriter(utimeline);
+			
 		} else if (scObj == subCmdUpVector.OWN_RETWEETS) {
+			
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			stmanager.userTimeLine(tAuth.getTwitterInstance().getScreenName(),
-					scObj);
+			List<String> ownretweeters = stmanager.userTimeLine(tAuth.getTwitterInstance().getScreenName(),scObj);
+			ddManager.listObjectWriter(ownretweeters);
+			
 		} else if (scObj == subCmdUpVector.GET_STATUS_BY_ID) {
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			stmanager.getStatusById(TwitterCredentials.getsID());
+			List<String> status = stmanager.getStatusById(TwitterCredentials.getsID());
+			ddManager.listObjectWriter(status);
+			
 		} else if (scObj == subCmdUpVector.GET_STATUS_RETWEETERS) {
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			stmanager.getStatusRetweeters(TwitterCredentials.getsID());
+			List<String> retweeters = stmanager.getStatusRetweeters(TwitterCredentials.getsID());
+			ddManager.listObjectWriter(retweeters);
+			
 		} else if (scObj == subCmdUpVector.MENTIONS_TIMELINE) {
 			StatusesManager stmanager = new StatusesManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			stmanager.getMentionsTimeline();
-
+			List<String> mentiontl = stmanager.getMentionsTimeline();
+			ddManager.listObjectWriter(mentiontl);
+			
 		} else if (scObj == subCmdUpVector.SEARCH_TWEETS) {
 			
 			SearchManager smanager = new SearchManager(tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
@@ -223,8 +233,9 @@ public class AppLauncher {
 
 			UsersManager umanager = new UsersManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			umanager.lookupUsers(TwitterCredentials.getInputFile());
-
+			List <String> users = umanager.lookupUsers(TwitterCredentials.getInputFile());
+			ddManager.listObjectWriter(users);
+			
 		} else if (scObj == subCmdUpVector.BLOCK_LIST) {
 
 			AccountManager amanager = new AccountManager(
@@ -263,17 +274,23 @@ public class AppLauncher {
 
 			UsersManager umanager = new UsersManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			umanager.getSuggestedCatagories();
+			List<String> sgstedCats = umanager.getSuggestedCatagories();
+			ddManager.listObjectWriter(sgstedCats);
+			
 		} else if (scObj == subCmdUpVector.SUGGESTION_SLUG) {
 
 			UsersManager umanager = new UsersManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			umanager.getUserSuggestions(TwitterCredentials.getcSlug());
+			List<String> usuggstions = umanager.getUserSuggestions(TwitterCredentials.getcSlug());
+			ddManager.listObjectWriter(usuggstions);
+			
 		} else if (scObj == subCmdUpVector.MEMBER_SUGGESTION) {
 
 			UsersManager umanager = new UsersManager(
 					tAuth.getTwitterInstance(), ddManager, cRManager, lManager);
-			umanager.getMemberSuggestions(TwitterCredentials.getcSlug());
+			List<String> msuggstions = umanager.getMemberSuggestions(TwitterCredentials.getcSlug());
+			ddManager.listObjectWriter(msuggstions);
+			
 		} else if (scObj == subCmdUpVector.USER_LISTS) {
 
 			ListsManager lmanager = new ListsManager(

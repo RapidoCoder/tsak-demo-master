@@ -1,6 +1,7 @@
 package twitterhandler;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,16 @@ public class StatusesManager {
 	DDManager ddManager;
 	CrManager cRManager;
 	LimitsManager lManager;
+	private Status status;
+	
+	List<String> smReturn;
+	private IDs ids;
+	private Paging page;
+	private List<Status> statuses;
+	private Map<String, Object> mentionsTL;
+	private Map<String, Object> tweet;
+	private Map<String, Object> user;
+	private JSONObject jObj;
 	
 	public StatusesManager(Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg) {
 		
@@ -31,9 +42,10 @@ public class StatusesManager {
 		cRManager = crm;
 		lManager = lmg;
 		twitter = twtr;
+		smReturn = new ArrayList<String>();
 	}
 	
-	public void getStatusById (String sID) throws TsakException {
+	public List<String> getStatusById (String sID) throws TsakException {
 		
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 		
@@ -57,11 +69,16 @@ public class StatusesManager {
 			}
 			
 			Long status_id = Long.parseLong(sID);
-			Status status = twitter.showStatus(status_id);
+			status = twitter.showStatus(status_id);
 			
-			ddManager.writeLine(status.getId() + "\t"
-					+ status.getUser().getScreenName() + "\t"
-					+ status.getText(), true);
+			
+			smReturn.add(status.getId() + "\t"
+			+ status.getUser().getScreenName() + "\t"
+			+ status.getText());
+					
+//			ddManager.writeLine(status.getId() + "\t"
+//					+ status.getUser().getScreenName() + "\t"
+//					+ status.getText(), true);
 			
 			cRManager.DisplayInfoMessage("[INFO]: Status Dumped Successfully to "
 					+ TwitterCredentials.getOutputFile(), true);
@@ -70,9 +87,11 @@ public class StatusesManager {
 			
 			cRManager.DisplayErrorMessage("[ERROR]: " + te.getMessage(),true);	
 		}
+		
+		return smReturn;
 	}
 	
-	public void getStatusRetweeters (String sID) throws TsakException {
+	public List<String> getStatusRetweeters (String sID) throws TsakException {
 		
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 		
@@ -99,14 +118,16 @@ public class StatusesManager {
 			
 			Long status_id = Long.parseLong(sID);
 			long pageCursor = -1;
-			IDs ids;
 			do {
 
 				ids = twitter.getRetweeterIds(status_id, pageCursor);
 
 				for (Long id : ids.getIDs()) {
-					ddManager.writeLine(String.valueOf(id) , true);
+					
+					smReturn.add(String.valueOf(id));
+					//ddManager.writeLine(String.valueOf(id) , true);
 					counter ++;
+					
 				}
 
 			} while ((pageCursor = ids.getNextCursor()) != 0);
@@ -123,10 +144,12 @@ public class StatusesManager {
 			
 			cRManager.DisplayErrorMessage("[ERROR]: " + te.getMessage(),true);	
 		}
+		
+		return smReturn;
 	}
 	
 	
-	public void getMentionsTimeline () throws TsakException {
+	public List<String> getMentionsTimeline () throws TsakException {
 		
 		cRManager.DisplayInfoMessage("[INFO]: Checking Rate Limits Availibity.", true);
 		
@@ -149,17 +172,17 @@ public class StatusesManager {
 								+ availableTime + " Seconds.");
 			}
 			
-			Paging page = new Paging(1, 200);
-			List<Status> statuses = null;
+			page = new Paging(1, 200);
+			
 			do {
 				statuses = twitter.getMentionsTimeline(page);
 
 				for (Status status : statuses) {
 
-					Map<String, Object> mentionsTL = new HashMap<String, Object>();
+					mentionsTL = new HashMap<String, Object>();
 
-					Map<String, Object> tweet = new HashMap<String, Object>();
-					Map<String, Object> user = new HashMap<String, Object>();
+					tweet = new HashMap<String, Object>();
+					user = new HashMap<String, Object>();
 
 					tweet.put("id", status.getId());
 					tweet.put("text", status.getText());
@@ -186,9 +209,10 @@ public class StatusesManager {
 					mentionsTL.put("user", user);
 					mentionsTL.put("tweet", tweet);
 
-					JSONObject json_mntl = new JSONObject(mentionsTL);
+					jObj = new JSONObject(mentionsTL);
 
-					ddManager.writeLine(json_mntl.toString(), true);
+					smReturn.add(jObj.toString());
+					//ddManager.writeLine(jObj.toString(), true);
 				}
 
 				page.setPage(page.getPage() + 1);
@@ -211,9 +235,11 @@ public class StatusesManager {
 			cRManager.DisplayErrorMessage("[ERROR]: " + e.getMessage(), true);
 			
 		}
+		
+		return smReturn;
 	}
 	
-	public void userTimeLine(String Tuser,subCmdUpVector sbv)
+	public List<String> userTimeLine(String Tuser,subCmdUpVector sbv)
 			throws FileNotFoundException, TsakException {
 
 		int counter = 0;
@@ -265,19 +291,19 @@ public class StatusesManager {
 			cRManager.DisplayInfoMessage(
 					"[INFO]: Dumping Statuses to file...", true);
 
-			List<Status> statuses = null;
-
 			int pageCounter = 1;
 
 			if (sbv == subCmdUpVector.HOME_TIMELINE) {
 				int maxTweetsRetrive = 200;
 				
-				Paging page = new Paging(pageCounter, maxTweetsRetrive);
+				page = new Paging(pageCounter, maxTweetsRetrive);
 				do {
 					
 					statuses = twitter.getHomeTimeline(page);
 					for (Status status : statuses) {
-						ddManager.writeLine(status.getId() +"\t"+ status.getText(), true);
+
+						smReturn.add(status.getId() +"\t"+ status.getText());
+						//ddManager.writeLine(status.getId() +"\t"+ status.getText(), true);
 						counter++;
 					}
 					pageCounter++;
@@ -286,7 +312,7 @@ public class StatusesManager {
 				
 			}else if (sbv == subCmdUpVector.USER_TIMELINE) {
 				int maxTweetsRetrive = 200;
-				Paging page = new Paging(pageCounter, maxTweetsRetrive);
+				page = new Paging(pageCounter, maxTweetsRetrive);
 				do {
 					
 					try {
@@ -304,7 +330,8 @@ public class StatusesManager {
 					}
 
 					for (Status status : statuses) {
-						ddManager.writeLine(status.getText(), true);
+						smReturn.add(status.getText());
+						//ddManager.writeLine(status.getText(), true);
 						counter++;
 					}
 
@@ -315,14 +342,17 @@ public class StatusesManager {
 			}else if (sbv == subCmdUpVector.OWN_RETWEETS) {
 				
 				int maxTweetsRetrive = 100;
-				Paging page = new Paging(pageCounter, maxTweetsRetrive);
+				page = new Paging(pageCounter, maxTweetsRetrive);
 				do {
 					statuses = twitter.getRetweetsOfMe(page);
 					userScreenName = Tuser;
 
 					for (Status status : statuses) {
-						ddManager.writeLine(status.getText(), true);
+						
+						smReturn.add(status.getText());
+						//ddManager.writeLine(status.getText(), true);
 						counter++;
+						
 					}
 
 					pageCounter++;
@@ -345,6 +375,7 @@ public class StatusesManager {
 			
 		}finally {
 		}
+		return smReturn;
 	}
 	
 	
