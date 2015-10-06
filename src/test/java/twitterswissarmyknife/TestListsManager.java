@@ -46,12 +46,13 @@ import dto.TsakException;
 @PrepareForTest({ ListsManager.class,
 		TwitterCredentials.class, Paging.class })
 public class TestListsManager {
+	int lmts[] = { 10, 500 };
+	
 	@Mock
 	CrManager cRManager;
 	Twitter twitter;
 	LimitsManager lManager;
 	DDManager ddManager;
-
 	Status status;
 	Status getRetweetdStatus;
 	ResponseList<Status> statuses;
@@ -64,9 +65,7 @@ public class TestListsManager {
 	Iterator<User> userIterator;
 	GeoLocation geoLocation;
 	Date date;
-
 	UserList userlist;
-
 	Iterator<UserList> userlistIterator;
 	ResponseList<UserList> userlists;
 	PagableResponseList<UserList> lists;
@@ -79,7 +78,6 @@ public class TestListsManager {
 		twitter = Mockito.mock(Twitter.class);
 		lManager = Mockito.mock(LimitsManager.class);
 		ddManager = Mockito.mock(DDManager.class);
-
 		PowerMockito.mockStatic(TwitterCredentials.class);
 		userlists = Mockito.mock(ResponseList.class);
 		userlist = Mockito.mock(UserList.class);
@@ -120,10 +118,8 @@ public class TestListsManager {
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-
 		PowerMockito.whenNew(Paging.class).withArguments(1, 50)
 				.thenReturn(page);
-		int lmts[] = { 10, 500 };
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.LISTS_STATUSES)).thenReturn(lmts);
@@ -132,11 +128,9 @@ public class TestListsManager {
 				twitter.getUserListStatuses(
 						Long.parseLong(TwitterCredentials.getLid()), page))
 				.thenReturn(statuses);
-
 		Mockito.when(statusIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(statusIterator.next()).thenReturn(status);
 		Mockito.when(statuses.iterator()).thenReturn(statusIterator);
-
 		Mockito.when(status.getCreatedAt()).thenReturn(null);
 		Mockito.when(status.getId()).thenReturn(010101L);
 		Mockito.when(status.getText())
@@ -154,18 +148,15 @@ public class TestListsManager {
 
 		ListsManager listManager = new ListsManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = listManager.getListStatuses();
-
 		assertEquals(result, expected);
-
 	}
 
 	@Test
 	public void getUserLists() throws NumberFormatException, TwitterException,
 			TsakException {
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
-		expectedMap.put("id", 010101L);
+		expectedMap.put("id", 1010101L);
 		expectedMap
 				.put("description",
 						"BigDataDiary brings you latest news on BigData, NoSQL along with updates on relevant products and services.");
@@ -174,7 +165,6 @@ public class TestListsManager {
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 10, 500 };
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.LISTS_LIST)).thenReturn(lmts);
@@ -182,20 +172,17 @@ public class TestListsManager {
 		Mockito.when(
 				twitter.getUserLists(Long.parseLong(TwitterCredentials.getuID())))
 				.thenReturn(userlists);
-
 		Mockito.when(userlistIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(userlistIterator.next()).thenReturn(userlist);
 		Mockito.when(userlists.iterator()).thenReturn(userlistIterator);
-
 		Mockito.when(userlist.getName()).thenReturn("BigData");
-		Mockito.when(userlist.getId()).thenReturn(010101L);
+		Mockito.when(userlist.getId()).thenReturn(1010101L);
 		Mockito.when(userlist.getDescription())
 				.thenReturn(
 						"BigDataDiary brings you latest news on BigData, NoSQL along with updates on relevant products and services.");
 
 		ListsManager listManager = new ListsManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = listManager.getUserLists();
 		assertEquals(result, expected);
 	}
@@ -204,7 +191,7 @@ public class TestListsManager {
 	public void getUserListSubscribers() throws TsakException,
 			NumberFormatException, TwitterException {
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
-		expectedMap.put("id", 010101L);
+		expectedMap.put("id", 1010101L);
 		expectedMap.put("location", "London");
 		expectedMap.put("profile_image", "http://someImageUrl/image.jpg");
 		expectedMap.put("friends_count", 10);
@@ -212,11 +199,9 @@ public class TestListsManager {
 		expectedMap.put("screen_name", "JhonSmith");
 		expectedMap.put("language", "english");
 		expectedMap.put("followers_count", 20);
-
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 10, 500 };
 		subCmdUpVector sbv = subCmdUpVector.LIST_SUBSCRIBERS;
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -230,10 +215,9 @@ public class TestListsManager {
 		Mockito.when(userIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(userIterator.next()).thenReturn(user);
 		Mockito.when(users.iterator()).thenReturn(userIterator);
-
 		Mockito.when(user.getScreenName()).thenReturn("JhonSmith");
 		Mockito.when(user.getName()).thenReturn("Jhon Smith");
-		Mockito.when(user.getId()).thenReturn(010101L);
+		Mockito.when(user.getId()).thenReturn(1010101L);
 		Mockito.when(user.getBiggerProfileImageURL()).thenReturn(
 				"http://someImageUrl/image.jpg");
 		Mockito.when(user.getFriendsCount()).thenReturn(10);
@@ -243,7 +227,6 @@ public class TestListsManager {
 
 		ListsManager listManager = new ListsManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = listManager.getUserListSubscribers(sbv);
 		assertEquals(result, expected);
 	}
@@ -264,7 +247,6 @@ public class TestListsManager {
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 10, 500 };
 		subCmdUpVector sbv = subCmdUpVector.LIST_MEMBERS;
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -277,7 +259,6 @@ public class TestListsManager {
 		Mockito.when(userIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(userIterator.next()).thenReturn(user);
 		Mockito.when(users.iterator()).thenReturn(userIterator);
-
 		Mockito.when(user.getScreenName()).thenReturn("JhonSmith");
 		Mockito.when(user.getName()).thenReturn("Jhon Smith");
 		Mockito.when(user.getId()).thenReturn(1010101L);
@@ -290,7 +271,6 @@ public class TestListsManager {
 
 		ListsManager listManager = new ListsManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = listManager.getUserListSubscribers(sbv);
 		assertEquals(result, expected);
 	}
@@ -300,7 +280,7 @@ public class TestListsManager {
 			URISyntaxException {
 		URI uri = new URI("https://twitter.com/BigDataDiary");
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
-		expectedMap.put("id", 020202L);
+		expectedMap.put("id", 2020202L);
 		expectedMap.put("members_count", 50);
 		expectedMap
 				.put("description",
@@ -309,12 +289,9 @@ public class TestListsManager {
 		expectedMap.put("subscribers_count", 50);
 		expectedMap.put("slug", "BigDataDairy");
 		expectedMap.put("uri", uri);
-
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 10, 500 };
-
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.LISTS_SUBSCRIPTIONS)).thenReturn(
@@ -328,8 +305,7 @@ public class TestListsManager {
 		Mockito.when(userlistIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(userlistIterator.next()).thenReturn(userlist);
 		Mockito.when(lists.iterator()).thenReturn(userlistIterator);
-
-		Mockito.when(userlist.getId()).thenReturn(020202L);
+		Mockito.when(userlist.getId()).thenReturn(2020202L);
 		Mockito.when(userlist.getSlug()).thenReturn("BigDataDairy");
 		Mockito.when(userlist.getName()).thenReturn("BigData");
 		Mockito.when(userlist.getMemberCount()).thenReturn(50);
@@ -341,9 +317,7 @@ public class TestListsManager {
 
 		ListsManager listManager = new ListsManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = listManager.UserListSubsciptions();
-
 		assertEquals(result, expected);
 	}
 }

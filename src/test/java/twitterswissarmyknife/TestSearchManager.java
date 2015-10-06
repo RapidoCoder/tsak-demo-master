@@ -36,13 +36,13 @@ import dto.TsakException;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SearchManager.class, TwitterCredentials.class })
 public class TestSearchManager {
-
+	int lmts[] = { 10, 500 };
+	
 	@Mock
 	CrManager cRManager;
 	Twitter twitter;
 	LimitsManager lManager;
 	DDManager ddManager;
-
 	Iterator<User> userIterator;
 	Iterator<Status> tweetIterator;
 	ResponseList<User> users;
@@ -58,7 +58,6 @@ public class TestSearchManager {
 		twitter = Mockito.mock(Twitter.class);
 		ddManager = Mockito.mock(DDManager.class);
 		lManager = Mockito.mock(LimitsManager.class);
-
 		PowerMockito.mockStatic(TwitterCredentials.class);
 		users = Mockito.mock(ResponseList.class);
 		userIterator = Mockito.mock(Iterator.class);
@@ -67,14 +66,13 @@ public class TestSearchManager {
 		tweets = Mockito.mock(List.class);
 		tweetIterator = Mockito.mock(Iterator.class);
 		tweet = Mockito.mock(Status.class);
-
 	}
 
 	@Test
 	public void searchUsers() throws TwitterException, TsakException {
 
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
-		expectedMap.put("id", 010101L);
+		expectedMap.put("id", 1010101L);
 		expectedMap.put("location", "London");
 		expectedMap.put("profile_image", "http://someImageUrl/image.jpg");
 		expectedMap.put("friends_count", 10);
@@ -83,26 +81,21 @@ public class TestSearchManager {
 		expectedMap.put("language", "english");
 		expectedMap.put("followers_count", 20);
 		JSONObject expectedJson = new JSONObject(expectedMap);
-
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-
-		int lmts[] = { 10, 500 };
 
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.USERS_SEARCH)).thenReturn(lmts);
-		String name = "JhonSmith";
-
-		Mockito.when(twitter.searchUsers(name, -1)).thenReturn(users);
-
+		
+		Mockito.when(twitter.searchUsers("JhonSmith", -1)).thenReturn(users);
 		Mockito.when(userIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(userIterator.next()).thenReturn(user);
 		Mockito.when(users.iterator()).thenReturn(userIterator);
 
 		Mockito.when(user.getScreenName()).thenReturn("JhonSmith");
 		Mockito.when(user.getName()).thenReturn("Jhon Smith");
-		Mockito.when(user.getId()).thenReturn(010101L);
+		Mockito.when(user.getId()).thenReturn(1010101L);
 		Mockito.when(user.getBiggerProfileImageURL()).thenReturn(
 				"http://someImageUrl/image.jpg");
 		Mockito.when(user.getFriendsCount()).thenReturn(10);
@@ -112,7 +105,7 @@ public class TestSearchManager {
 
 		SearchManager searcManager = new SearchManager(twitter, ddManager,
 				cRManager, lManager);
-		List<String> result = searcManager.searchUsers(name);
+		List<String> result = searcManager.searchUsers("JhonSmith");
 		assertEquals(result, expected);
 	}
 
@@ -134,12 +127,9 @@ public class TestSearchManager {
 		expected.put("user", expectedMap);
 		expected.put("tweet",
 				"In August, Larry Page and Sergey Brin announced their plans to reengineer");
-
 		JSONObject json = new JSONObject(expected);
 		List<String> expectedlist = new ArrayList<String>();
 		expectedlist.add(json.toString());
-		int lmts[] = { 10, 500 };
-
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.SEARCH_TWEETS)).thenReturn(lmts);
@@ -170,6 +160,5 @@ public class TestSearchManager {
 				cRManager, lManager);
 		List<String> result = searcManager.searchTweets("Larry Page");
 		assertEquals(result, expectedlist);
-
 	}
 }

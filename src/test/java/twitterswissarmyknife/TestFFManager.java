@@ -27,15 +27,15 @@ import dto.DDManager;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ controlVectors.class, TwitterCredentials.class })
 public class TestFFManager {
+	int lmts[] = { 10, 500 };
+	
 	@Mock
 	CrManager cRManager;
 	DDManager ddManager;
 	Twitter twitter;
 	LimitsManager lManager;
-	
 	IDs followerIds;
 	IDs friendsIds;
-	
 	ResponseList<User> followers;
 	ResponseList<User> followings;
 	ResponseList<User> expected;
@@ -58,10 +58,9 @@ public class TestFFManager {
 
 	@Test
 	public void getFollowersByID() throws Exception {
-		String uid = "010101";
-		int lmts[] = { 10, 500 };
+		
 		subCmdUpVector sbv = subCmdUpVector.FLWRZ_DUMP_BY_ID;
-		Mockito.when(twitter.getFollowersIDs(Long.parseLong(uid), -1L))
+		Mockito.when(twitter.getFollowersIDs(Long.parseLong("1010101"), -1L))
 				.thenReturn(followerIds);
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -70,17 +69,15 @@ public class TestFFManager {
 				lManager);
 		Mockito.when(twitter.lookupUsers(followerIds.getIDs())).thenReturn(
 				expected);
-
-		ResponseList<User> result = ffmanager.dumpFFToFile(uid, sbv);
+		ResponseList<User> result = ffmanager.dumpFFToFile("1010101", sbv);
 		assertEquals(result, expected);
 	}
 
 	@Test
 	public void getFollowersByScreenName() throws Exception {
-		String tuser = "JhonSmith";
-		int lmts[] = { 10, 500 };
+		
 		subCmdUpVector sbv = subCmdUpVector.FLWRZ_DUMP_BY_SCREEN_NAME;
-		Mockito.when(twitter.getFollowersIDs(tuser, -1L)).thenReturn(
+		Mockito.when(twitter.getFollowersIDs("JhonSmith", -1L)).thenReturn(
 				followerIds);
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -89,17 +86,15 @@ public class TestFFManager {
 				lManager);
 		Mockito.when(twitter.lookupUsers(followerIds.getIDs())).thenReturn(
 				expected);
-
-		ResponseList<User> result = ffmanager.dumpFFToFile(tuser, sbv);
+		ResponseList<User> result = ffmanager.dumpFFToFile("JhonSmith", sbv);
 		assertEquals(result, expected);
 	}
 
 	@Test
 	public void getFriendsByID() throws Exception {
-		String uid = "010101";
-		int lmts[] = { 10, 500 };
+		
 		subCmdUpVector sbv = subCmdUpVector.FRNDZ_DUMP_BY_ID;
-		Mockito.when(twitter.getFriendsIDs(Long.parseLong(uid), -1L))
+		Mockito.when(twitter.getFriendsIDs(Long.parseLong("1010101"), -1L))
 				.thenReturn(followerIds);
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -108,17 +103,15 @@ public class TestFFManager {
 				lManager);
 		Mockito.when(twitter.lookupUsers(friendsIds.getIDs())).thenReturn(
 				expected);
-
-		ResponseList<User> result = ffmanager.dumpFFToFile(uid, sbv);
+		ResponseList<User> result = ffmanager.dumpFFToFile("1010101", sbv);
 		assertEquals(result, expected);
 	}
 
 	@Test
 	public void getFriendsByScreenName() throws Exception {
-		String tuser = "JhonSmith";
-		int lmts[] = { 10, 500 };
+
 		subCmdUpVector sbv = subCmdUpVector.FRNDZ_DUMP_BY_SCREEN_NAME;
-		Mockito.when(twitter.getFriendsIDs(String.valueOf(tuser), -1L))
+		Mockito.when(twitter.getFriendsIDs(String.valueOf("JhonSmith"), -1L))
 				.thenReturn(followerIds);
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -127,8 +120,7 @@ public class TestFFManager {
 				lManager);
 		Mockito.when(twitter.lookupUsers(friendsIds.getIDs())).thenReturn(
 				expected);
-
-		ResponseList<User> result = ffmanager.dumpFFToFile(tuser, sbv);
+		ResponseList<User> result = ffmanager.dumpFFToFile("JhonSmith", sbv);
 		assertEquals(result, expected);
 	}
 }

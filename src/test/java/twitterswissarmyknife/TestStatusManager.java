@@ -37,12 +37,13 @@ import dto.TsakException;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ StatusesManager.class, TwitterCredentials.class, Paging.class })
 public class TestStatusManager {
+	int lmts[] = { 10, 500 };
+
 	@Mock
 	CrManager cRManager;
 	Twitter twitter;
 	LimitsManager lManager;
 	DDManager ddManager;
-
 	Status status;
 	ResponseList<Status> statuses;
 	Iterator<Status> statusIterator;
@@ -73,8 +74,8 @@ public class TestStatusManager {
 		expected.add(1010101L
 				+ "\t JhonSmith"
 				+ "\t BigDataDiary brings you latest news on BigData, NoSQL along with updates on relevant products and services.");
-		int lmts[] = { 10, 500 };
-		String sID = "1";
+
+		String sID = "303030";
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.STATUSES_SHOW_ID)).thenReturn(
@@ -98,8 +99,8 @@ public class TestStatusManager {
 			TwitterException, TsakException {
 		List<String> expected = new ArrayList<String>();
 		expected.add(String.valueOf(1));
-		int lmts[] = { 10, 500 };
-		String sID = "1010101";
+
+		String sID = "303030";
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.STATUSES_RETWEETERS_IDS))
@@ -144,7 +145,6 @@ public class TestStatusManager {
 		String expectedString = jObj.toString();
 		expected.add(expectedString);
 
-		int lmts[] = { 10, 500 };
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.STATUSES_MENTIONS_TIMELINE))
@@ -160,7 +160,6 @@ public class TestStatusManager {
 		Mockito.when(status.getInReplyToScreenName()).thenReturn("michael");
 		Mockito.when(status.getInReplyToStatusId()).thenReturn(2L);
 		Mockito.when(status.getInReplyToUserId()).thenReturn(3L);
-
 		Mockito.when(status.getUser()).thenReturn(user);
 
 		Mockito.when(user.getScreenName()).thenReturn("JhonSmith");
@@ -176,9 +175,7 @@ public class TestStatusManager {
 		StatusesManager statusManager = new StatusesManager(twitter, ddManager,
 				cRManager, lManager);
 		List<String> result = statusManager.getMentionsTimeline();
-
 		assertEquals(result, expected);
-
 	}
 
 	@Test
@@ -187,15 +184,13 @@ public class TestStatusManager {
 				.thenReturn(page);
 		List<String> expected = new ArrayList<String>();
 		expected.add(202020L + "\tGoogle was founded by Larry Page and Sergey Brin while they were Ph.D. students at Stanford University.");
-		
-		int lmts[] = { 10, 500 };
+
 		subCmdUpVector sbv = subCmdUpVector.HOME_TIMELINE;
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.STATUSES_HOME_TIMELINE))
 				.thenReturn(lmts);
 		Mockito.when(twitter.getHomeTimeline(page)).thenReturn(statuses);
-
 		Mockito.when(statusIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(statusIterator.next()).thenReturn(status);
 		Mockito.when(statuses.iterator()).thenReturn(statusIterator);
@@ -204,10 +199,8 @@ public class TestStatusManager {
 		Mockito.when(status.getText())
 				.thenReturn(
 						"Google was founded by Larry Page and Sergey Brin while they were Ph.D. students at Stanford University.");
-
 		StatusesManager statusManager = new StatusesManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = statusManager.userTimeLine("JhonSmith", sbv);
 		assertEquals(result, expected);
 	}
@@ -218,8 +211,7 @@ public class TestStatusManager {
 				.thenReturn(page);
 		List<String> expected = new ArrayList<String>();
 		expected.add("Enhance Big Data Performance With Latest Version Of Talend.");
-		
-		int lmts[] = { 10, 500 };
+
 		subCmdUpVector sbv = subCmdUpVector.USER_TIMELINE;
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -230,16 +222,14 @@ public class TestStatusManager {
 				twitter.getUserTimeline(
 						Long.parseLong(TwitterCredentials.getuID()), page))
 				.thenReturn(statuses);
-
 		Mockito.when(statusIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(statusIterator.next()).thenReturn(status);
 		Mockito.when(statuses.iterator()).thenReturn(statusIterator);
-
-		Mockito.when(status.getText()).thenReturn("Enhance Big Data Performance With Latest Version Of Talend.");
+		Mockito.when(status.getText()).thenReturn(
+				"Enhance Big Data Performance With Latest Version Of Talend.");
 
 		StatusesManager statusManager = new StatusesManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = statusManager.userTimeLine("JhonSmith", sbv);
 		assertEquals(result, expected);
 	}
@@ -251,7 +241,7 @@ public class TestStatusManager {
 		List<String> expected = new ArrayList<String>();
 		expected.add("Enhance Big Data Performance With Latest Version Of Talend.");
 		String tuser = "1010101";
-		int lmts[] = { 10, 500 };
+
 		subCmdUpVector sbv = subCmdUpVector.OWN_RETWEETS;
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -262,12 +252,11 @@ public class TestStatusManager {
 		Mockito.when(statusIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(statusIterator.next()).thenReturn(status);
 		Mockito.when(statuses.iterator()).thenReturn(statusIterator);
-
-		Mockito.when(status.getText()).thenReturn("Enhance Big Data Performance With Latest Version Of Talend.");
-
+		Mockito.when(status.getText()).thenReturn(
+				"Enhance Big Data Performance With Latest Version Of Talend.");
+		
 		StatusesManager statusManager = new StatusesManager(twitter, ddManager,
 				cRManager, lManager);
-
 		List<String> result = statusManager.userTimeLine(tuser, sbv);
 		assertEquals(result, expected);
 	}

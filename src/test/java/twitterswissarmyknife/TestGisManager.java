@@ -37,9 +37,11 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({GisManager.class, controlVectors.class, TwitterCredentials.class,
-		GeoLocation.class, GeoQuery.class})
+@PrepareForTest({ GisManager.class, controlVectors.class,
+		TwitterCredentials.class, GeoLocation.class, GeoQuery.class })
 public class TestGisManager {
+	int lmts[] = { 10, 500 };
+
 	@Mock
 	Twitter twitter;
 	DDManager ddManager;
@@ -50,13 +52,9 @@ public class TestGisManager {
 	Place place;
 	ResponseList<Place> places;
 	Iterator<Place> placeIterator;
-
 	Location location;
 	ResponseList<Location> locations;
 	Iterator<Location> locationIterator;
-	
-	
-	
 	Trends trends;
 	Trend trend;
 
@@ -68,7 +66,7 @@ public class TestGisManager {
 		lManager = Mockito.mock(LimitsManager.class);
 		ddManager = Mockito.mock(DDManager.class);
 		PowerMockito.mockStatic(TwitterCredentials.class);
-		
+
 		geoQuery = Mockito.mock(GeoQuery.class);
 		places = Mockito.mock(ResponseList.class);
 		place = Mockito.mock(Place.class);
@@ -79,12 +77,11 @@ public class TestGisManager {
 		locationIterator = Mockito.mock(Iterator.class);
 		trends = Mockito.mock(Trends.class);
 		trend = Mockito.mock(Trend.class);
-		
-
 	}
 
 	@Test
 	public void getSimilarPlaces() throws NumberFormatException, Exception {
+
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("id", "2379574");
 		expectedMap.put("name", "chicago");
@@ -94,31 +91,28 @@ public class TestGisManager {
 		expectedMap.put("country", "USA");
 		expectedMap.put("full_name", "Chicago city, USA");
 		JSONObject expectedJson = new JSONObject(expectedMap);
-
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
 
-		int lmts[] = { 10, 500 };
-
-		String name = "chicago";
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.GEO_SIMILAR_PLACES)).thenReturn(
 				lmts);
 		Mockito.when(TwitterCredentials.getLatitude()).thenReturn("41.51");
 		Mockito.when(TwitterCredentials.getLongitude()).thenReturn("87.39");
-		PowerMockito.whenNew(GeoLocation.class).withArguments(Double.parseDouble("41.51"),
-				Double.parseDouble("87.39")).thenReturn(geoLocation);
-		Mockito.when(TwitterCredentials.getPlaceName()).thenReturn(name);
-		Mockito.when(twitter.getSimilarPlaces(geoLocation, name, null, null))
+		PowerMockito
+				.whenNew(GeoLocation.class)
+				.withArguments(Double.parseDouble("41.51"),
+						Double.parseDouble("87.39")).thenReturn(geoLocation);
+		Mockito.when(TwitterCredentials.getPlaceName()).thenReturn("chicago");
+		Mockito.when(
+				twitter.getSimilarPlaces(geoLocation, "chicago", null, null))
 				.thenReturn(places);
 
 		Mockito.when(places.size()).thenReturn(1);
-
 		Mockito.when(placeIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(placeIterator.next()).thenReturn(place);
 		Mockito.when(places.iterator()).thenReturn(placeIterator);
-
 		Mockito.when(place.getId()).thenReturn("2379574");
 		Mockito.when(place.getName()).thenReturn("chicago");
 		Mockito.when(place.getCountry()).thenReturn("USA");
@@ -126,7 +120,6 @@ public class TestGisManager {
 		Mockito.when(place.getFullName()).thenReturn("Chicago city, USA");
 		Mockito.when(place.getPlaceType()).thenReturn("Town");
 		Mockito.when(place.getStreetAddress()).thenReturn("Chicago, IL, USA");
-
 		Mockito.when(place.getContainedWithIn()).thenReturn(null);
 
 		GisManager gisManager = new GisManager(twitter, ddManager, cRManager,
@@ -148,7 +141,7 @@ public class TestGisManager {
 		expectedMap.put("full_name", "Chicago city, USA");
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		String expected = expectedJson.toString();
-		int lmts[] = { 10, 500 };
+
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.GEO_ID_PLACE_ID))
@@ -185,22 +178,22 @@ public class TestGisManager {
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
 
-		int lmts[] = { 10, 500 };
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.GEO_SEARCH)).thenReturn(lmts);
-
 		Mockito.when(TwitterCredentials.getLatitude()).thenReturn("38.9047");
 		Mockito.when(TwitterCredentials.getLongitude()).thenReturn("77.0164");
-		
-		PowerMockito.whenNew(GeoLocation.class).withArguments(Double.parseDouble("38.9047"), Double.parseDouble("77.0164") ).thenReturn(geoLocation);
-		PowerMockito.whenNew(GeoQuery.class).withArguments(geoLocation ).thenReturn(geoQuery);
+		PowerMockito
+				.whenNew(GeoLocation.class)
+				.withArguments(Double.parseDouble("38.9047"),
+						Double.parseDouble("77.0164")).thenReturn(geoLocation);
+		PowerMockito.whenNew(GeoQuery.class).withArguments(geoLocation)
+				.thenReturn(geoQuery);
 		Mockito.when(twitter.searchPlaces(geoQuery)).thenReturn(places);
 		Mockito.when(places.size()).thenReturn(1);
 		Mockito.when(placeIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(placeIterator.next()).thenReturn(place);
 		Mockito.when(places.iterator()).thenReturn(placeIterator);
-
 		Mockito.when(place.getId()).thenReturn("2379574");
 		Mockito.when(place.getName()).thenReturn("chicago");
 		Mockito.when(place.getCountry()).thenReturn("USA");
@@ -214,7 +207,6 @@ public class TestGisManager {
 				lManager);
 		List<String> result = gisManager.searchPlace();
 		assertEquals(result, expected);
-
 	}
 
 	@Test
@@ -229,11 +221,10 @@ public class TestGisManager {
 		expectedMap.put("country_code", "+1");
 		expectedMap.put("url", "http://urlForChicago.com");
 		expectedMap.put("country", "USA");
-		
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 10, 500 };
+
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.TRENDS_AVAILABLE)).thenReturn(
@@ -242,7 +233,6 @@ public class TestGisManager {
 		Mockito.when(locationIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(locationIterator.next()).thenReturn(location);
 		Mockito.when(locations.iterator()).thenReturn(locationIterator);
-		
 		Mockito.when(location.getName()).thenReturn("Chicago");
 		Mockito.when(location.getWoeid()).thenReturn(2379574);
 		Mockito.when(location.getCountryName()).thenReturn("USA");
@@ -250,47 +240,45 @@ public class TestGisManager {
 		Mockito.when(location.getURL()).thenReturn("http://urlForChicago.com");
 		Mockito.when(location.getPlaceName()).thenReturn("Town");
 		Mockito.when(location.getPlaceCode()).thenReturn(+312);
-		
-		
+
 		GisManager gisManager = new GisManager(twitter, ddManager, cRManager,
 				lManager);
 		List<String> result = gisManager.getAvalilableTrends();
 		assertEquals(result, expected);
-		
 	}
-	
+
 	@Test
-	public void getPlaceTrends() throws NumberFormatException, TwitterException, TsakException{
+	public void getPlaceTrends() throws NumberFormatException,
+			TwitterException, TsakException {
+		
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("query", "chicago new trends");
 		expectedMap.put("name", "chicago");
 		expectedMap.put("url", "http://urlForChicago.com");
-	
-		
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 10, 500 };
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
-						LimitsEndPointsVector.TRENDS_PLACE)).thenReturn(
-				lmts);
+						LimitsEndPointsVector.TRENDS_PLACE)).thenReturn(lmts);
 		Mockito.when(TwitterCredentials.getWoeid()).thenReturn("2379574");
-		Mockito.when(twitter.getPlaceTrends(Integer.parseInt(TwitterCredentials.getWoeid()))).thenReturn(trends);
-		Mockito.when(trends.getTrends()).thenReturn(new Trend[]{trend});
-		
+		Mockito.when(
+				twitter.getPlaceTrends(Integer.parseInt(TwitterCredentials
+						.getWoeid()))).thenReturn(trends);
+		Mockito.when(trends.getTrends()).thenReturn(new Trend[] { trend });
 		Mockito.when(trend.getName()).thenReturn("chicago");
 		Mockito.when(trend.getQuery()).thenReturn("chicago new trends");
 		Mockito.when(trend.getURL()).thenReturn("http://urlForChicago.com");
-		
+
 		GisManager gisManager = new GisManager(twitter, ddManager, cRManager,
 				lManager);
 		List<String> result = gisManager.getPlaceTrends();
 		assertEquals(result, expected);
 	}
-	
+
 	@Test
-	public void getClosestTrends() throws NumberFormatException, Exception{
+	public void getClosestTrends() throws NumberFormatException, Exception {
+		
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		Map<String, Object> type = new HashMap<String, Object>();
 		type.put("place_code", +312);
@@ -301,24 +289,25 @@ public class TestGisManager {
 		expectedMap.put("country_code", "+1");
 		expectedMap.put("url", "http://urlForChicago.com");
 		expectedMap.put("country", "USA");
-		
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 10, 500 };
+
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
-						LimitsEndPointsVector.TRENDS_CLOSEST)).thenReturn(
-				lmts);
+						LimitsEndPointsVector.TRENDS_CLOSEST)).thenReturn(lmts);
 		Mockito.when(TwitterCredentials.getLatitude()).thenReturn("38.9047");
 		Mockito.when(TwitterCredentials.getLongitude()).thenReturn("77.0164");
 
-		PowerMockito.whenNew(GeoLocation.class).withArguments(Double.parseDouble("38.9047"), Double.parseDouble("77.0164") ).thenReturn(geoLocation);
-		Mockito.when(twitter.getClosestTrends(geoLocation)).thenReturn(locations);
+		PowerMockito
+				.whenNew(GeoLocation.class)
+				.withArguments(Double.parseDouble("38.9047"),
+						Double.parseDouble("77.0164")).thenReturn(geoLocation);
+		Mockito.when(twitter.getClosestTrends(geoLocation)).thenReturn(
+				locations);
 		Mockito.when(locationIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(locationIterator.next()).thenReturn(location);
 		Mockito.when(locations.iterator()).thenReturn(locationIterator);
-		
 		Mockito.when(location.getName()).thenReturn("Chicago");
 		Mockito.when(location.getWoeid()).thenReturn(2379574);
 		Mockito.when(location.getCountryName()).thenReturn("USA");
@@ -326,7 +315,7 @@ public class TestGisManager {
 		Mockito.when(location.getURL()).thenReturn("http://urlForChicago.com");
 		Mockito.when(location.getPlaceName()).thenReturn("Town");
 		Mockito.when(location.getPlaceCode()).thenReturn(+312);
-		
+
 		GisManager gisManager = new GisManager(twitter, ddManager, cRManager,
 				lManager);
 		List<String> result = gisManager.getClosestTrends();

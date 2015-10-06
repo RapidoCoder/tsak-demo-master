@@ -40,13 +40,13 @@ import dto.TsakException;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ TwitterCredentials.class })
 public class TestFriendshipManager {
-
+	int lmts[] = { 10, 500 };
+	
 	@Mock
 	Twitter twitter;
 	DDManager ddManager;
 	CrManager cRManager;
 	LimitsManager lManager;
-	
 	IDs ids;
 	IDs idsEmpty;
 	ResponseList<Friendship> friendships;
@@ -69,12 +69,11 @@ public class TestFriendshipManager {
 		relationship = Mockito.mock(Relationship.class);
 		users = Mockito.mock(PagableResponseList.class);
 		user = Mockito.mock(User.class);
-
 	}
 
 	@Test
 	public void inComingFriendships() throws TsakException, TwitterException {
-		int lmts[] = { 15, 1000 };
+	
 		long[] getIds = { 2L };
 		long[] emptyIds = {};
 		subCmdUpVector sbv = subCmdUpVector.INCOMING_FRNDSHIP;
@@ -87,7 +86,7 @@ public class TestFriendshipManager {
 		Mockito.when(ids.getIDs()).thenReturn(getIds);
 		Mockito.when(idsEmpty.getIDs()).thenReturn(emptyIds);
 		Mockito.when(ids.getNextCursor()).thenReturn(0L);
-
+		
 		FriendshipManager fManager = new FriendshipManager(twitter, ddManager,
 				cRManager, lManager);
 		List<Long> expected = new ArrayList<Long>();
@@ -98,7 +97,7 @@ public class TestFriendshipManager {
 	
 	@Test
 	public void outGoingFriendships() throws TsakException, TwitterException {
-		int lmts[] = { 10, 500 };
+		
 		long[] getIds = {2L};
 		long[] emptyIds = {};
 		subCmdUpVector sbv =subCmdUpVector.OUTGOING_FRNDSHIP;
@@ -122,7 +121,7 @@ public class TestFriendshipManager {
 	@Test
 	public void showFriendsShip() throws FileNotFoundException, TsakException,
 			TwitterException {
-		int lmts[] = { 15, 1000 };
+		
 		HashMap<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("source", "JhonSmith");
 		expectedMap.put("target", "michael");
@@ -135,7 +134,6 @@ public class TestFriendshipManager {
 
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		String expected = expectedJson.toString();
-
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.FRIENDSHIPS_SHOW)).thenReturn(
@@ -161,14 +159,13 @@ public class TestFriendshipManager {
 		String result = fManager.showFriendsShip();
 
 		assertEquals(result, expected);
-
 	}
 
 	@Test
 	public void getFriendsList() throws TsakException, NumberFormatException,
 			TwitterException {
+		
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
-
 		expectedMap.put("id", 010101L);
 		expectedMap.put("location", "London");
 		expectedMap.put("profile_image", "http://someImageUrl/image.jpg");
@@ -180,7 +177,7 @@ public class TestFriendshipManager {
 		JSONObject expectedJson = new JSONObject(expectedMap);
 		List<String> expected = new ArrayList<String>();
 		expected.add(expectedJson.toString());
-		int lmts[] = { 15, 1000 };
+	
 		subCmdUpVector sbv = subCmdUpVector.FRIENDS_LIST;
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
@@ -198,10 +195,10 @@ public class TestFriendshipManager {
 		Mockito.when(user.getFollowersCount()).thenReturn(20);
 		Mockito.when(user.getLocation()).thenReturn("London");
 		Mockito.when(user.getLang()).thenReturn("english");
+	
 		FriendshipManager fManager = new FriendshipManager(twitter, ddManager,
 				cRManager, lManager);
 		List<String> result = fManager.getFriendsList(sbv);
 		assertEquals(result, expected);
 	}
-
 }
