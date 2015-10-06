@@ -28,13 +28,12 @@ import twitterhandler.LimitsManager;
 import twitterhandler.TwitterCredentials;
 import twitterhandler.UsersManager;
 import dto.ControlHandlers.LimitsEndPointsVector;
-import dto.ControlHandlers.controlVectors;
 import dto.CrManager;
 import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({UsersManager.class, controlVectors.class, TwitterCredentials.class })
+@PrepareForTest({UsersManager.class, TwitterCredentials.class })
 public class TestUsersManager {
 
 	@Mock
@@ -74,7 +73,7 @@ public class TestUsersManager {
 	public void getSuggestedCatagories() throws TwitterException, TsakException {
 
 		List<String> expected = new ArrayList<String>();
-		expected.add("Twitter Catagory" + " \t " + "Twitter Catagory slug"
+		expected.add("Technology" + " \t " + "technologyhut"
 				+ " \t " + 10);
 
 		int lmts[] = { 10, 500 };
@@ -88,8 +87,8 @@ public class TestUsersManager {
 		Mockito.when(catIterator.next()).thenReturn(category);
 		Mockito.when(categories.iterator()).thenReturn(catIterator);
 		
-		Mockito.when(category.getName()).thenReturn("Twitter Catagory");
-		Mockito.when(category.getSlug()).thenReturn("Twitter Catagory slug");
+		Mockito.when(category.getName()).thenReturn("Technology");
+		Mockito.when(category.getSlug()).thenReturn("technologyhut");
 		Mockito.when(category.getSize()).thenReturn(10);
 		
 		UsersManager usersManager = new UsersManager(twitter, ddManager, cRManager, lManager);
@@ -104,7 +103,7 @@ public class TestUsersManager {
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
 		expectedMap.put("screen_name", "jhonSmith");
 		expectedMap.put("name", "Jhon Smith");
-		expectedMap.put("id", 1L);
+		expectedMap.put("id", 1010101L);
 		expectedMap.put("friends_count", 10);
 		expectedMap.put("followers_count", 20);
 		expectedMap.put("location", "london");
@@ -119,7 +118,7 @@ public class TestUsersManager {
 						LimitsEndPointsVector.USERS_SUGGESTIONS_SLUG)).thenReturn(
 				lmts);
 		
-		Mockito.when(twitter.getUserSuggestions("slug")).thenReturn(users);
+		Mockito.when(twitter.getUserSuggestions("technologyhut")).thenReturn(users);
 		
 		Mockito.when(userIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(userIterator.next()).thenReturn(user);
@@ -127,7 +126,7 @@ public class TestUsersManager {
 		
 		Mockito.when(user.getScreenName()).thenReturn("jhonSmith");
 		Mockito.when(user.getName()).thenReturn("Jhon Smith");
-		Mockito.when(user.getId()).thenReturn(1L);
+		Mockito.when(user.getId()).thenReturn(1010101L);
 		Mockito.when(user.getFriendsCount()).thenReturn(10);
 		Mockito.when(user.getFollowersCount()).thenReturn(20);
 		Mockito.when(user.getLocation()).thenReturn("london");
@@ -135,8 +134,7 @@ public class TestUsersManager {
 		
 		UsersManager usersManager = new UsersManager(twitter, ddManager, cRManager, lManager);
 
-		List<String> result = usersManager.getUserSuggestions("slug");
-		//System.out.println(result);
+		List<String> result = usersManager.getUserSuggestions("technologyhut");
 		assertEquals(result, expected);
 	}
 	
@@ -147,7 +145,7 @@ public class TestUsersManager {
 		expectedMap.put("status", "Private User");
 		expectedMap.put("name", "Jhon Smith");
 		expectedMap.put("id", 1L);
-		expectedMap.put("profile_image", "http://someImageUrl.com");
+		expectedMap.put("profile_image", "http://someImageUrl/image.jpg");
 		expectedMap.put("friends_count", 10);
 		expectedMap.put("followers_count", 20);
 		expectedMap.put("location", "london");
@@ -162,7 +160,7 @@ public class TestUsersManager {
 						LimitsEndPointsVector.USERS_SUGGESTIONS_SLUG_MEMBERS)).thenReturn(
 				lmts);
 		
-		Mockito.when(twitter.getMemberSuggestions("slug")).thenReturn(users);
+		Mockito.when(twitter.getMemberSuggestions("technologyhut")).thenReturn(users);
 		
 		Mockito.when(userIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(userIterator.next()).thenReturn(user);
@@ -172,7 +170,7 @@ public class TestUsersManager {
 		Mockito.when(user.getStatus()).thenReturn(status);
 		Mockito.when(user.getName()).thenReturn("Jhon Smith");
 		Mockito.when(user.getId()).thenReturn(1L);
-		Mockito.when(user.getMiniProfileImageURL()).thenReturn("http://someImageUrl.com");
+		Mockito.when(user.getMiniProfileImageURL()).thenReturn("http://someImageUrl/image.jpg");
 		Mockito.when(user.getFriendsCount()).thenReturn(10);
 		Mockito.when(user.getFollowersCount()).thenReturn(20);
 		Mockito.when(user.getLocation()).thenReturn("london");
@@ -180,7 +178,7 @@ public class TestUsersManager {
 		
 		UsersManager usersManager = new UsersManager(twitter, ddManager, cRManager, lManager);
 
-		List<String> result = usersManager.getMemberSuggestions("slug");
+		List<String> result = usersManager.getMemberSuggestions("technologyhut");
 		assertEquals(result, expected);
 	}
 }

@@ -17,7 +17,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import twitter4j.AccountSettings;
 import twitter4j.IDs;
 import twitter4j.PagableResponseList;
 import twitter4j.Paging;
@@ -39,7 +38,7 @@ import dto.DDManager;
 import dto.TsakException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({AccountManager.class,Paging.class, controlVectors.class, TwitterCredentials.class })
+@PrepareForTest({ controlVectors.class, TwitterCredentials.class })
 public class TestAccountManager {
 
 	@Mock
@@ -47,74 +46,65 @@ public class TestAccountManager {
 	DDManager ddManager;
 	CrManager cRManager;
 	LimitsManager lManager;
-	LimitsEndPointsVector limitVecotr;
-	Paging page;
-	PagableResponseList<UserList> lists;
-	IDs ids;
-
-	AccountSettings settings;
-	SavedSearch savedSearch;
-	ResponseList<SavedSearch> savedSearches;
-	Iterator<SavedSearch> savedSearchIterator;
-
-	Status status;
-	ResponseList<Status> statuses;
-	Iterator<Status> statusIterator;
-
 	
-	List<Map<String, Object>> maplists_return;
-	List<Object> objlist_return;
-	Map<String, Object> mapObj_return;
-
 	UserList list;
-
-	Iterator<UserList> userlistIterator;
-
+	Status status;
+	User user;
+	IDs ids;
+	PagableResponseList<UserList> lists;
 	PagableResponseList<User> users;
-	User tuser;
+	ResponseList<Status> statuses;
+	ResponseList<SavedSearch> savedSearches;
+	Iterator<UserList> userlistIterator;
+	Iterator<Status> statusIterator;
+	Iterator<SavedSearch> savedSearchIterator;
 	Iterator<User> userIterator;
+	SavedSearch savedSearch;
 
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
-		list = Mockito.mock(UserList.class);
-
-		lists = Mockito.mock(PagableResponseList.class);
-		userlistIterator = Mockito.mock(Iterator.class);
-
 		twitter = Mockito.mock(Twitter.class);
 		ddManager = Mockito.mock(DDManager.class);
 		cRManager = Mockito.mock(CrManager.class);
 		lManager = Mockito.mock(LimitsManager.class);
-		settings = Mockito.mock(AccountSettings.class);
 		PowerMockito.mockStatic(TwitterCredentials.class);
-		ids = Mockito.mock(IDs.class);
+		
+		list = Mockito.mock(UserList.class);
 		lists = Mockito.mock(PagableResponseList.class);
+		userlistIterator = Mockito.mock(Iterator.class);
+		ids = Mockito.mock(IDs.class);
 		users = Mockito.mock(PagableResponseList.class);
 		savedSearches = Mockito.mock(ResponseList.class);
 
 		savedSearch = Mockito.mock(SavedSearch.class);
 		savedSearchIterator = Mockito.mock(Iterator.class);
 		statuses = Mockito.mock(ResponseList.class);
-		
-		maplists_return = Mockito.mock(List.class);
-		page = Mockito.mock(Paging.class);
-
-		tuser = Mockito.mock(User.class);
-		users = Mockito.mock(PagableResponseList.class);
+		user = Mockito.mock(User.class);
 		userIterator = Mockito.mock(Iterator.class);
 		status = Mockito.mock(Status.class);
 		statusIterator = Mockito.mock(Iterator.class);
-		objlist_return = Mockito.mock(List.class);
-		mapObj_return = Mockito.mock(Map.class);
+	
 	}
 
 	@Test
 	public void userListMemberships() throws Exception {
+		
+		Map<String, Object> expextedMap = new HashMap<String, Object>();
+		expextedMap.put("id", 010101L);
+		expextedMap.put("description", "List description");
+		expextedMap.put("name", "Jhon smith");
+		expextedMap.put("subscribers_count", 10);
+		expextedMap.put("slug", "List slug");
+		expextedMap.put("members_count", 10);
+		expextedMap.put("uri", null);
+		List<Map<String, Object>> expected = new ArrayList<Map<String, Object>>();
+		
+		expected.add(expextedMap);
 
-		int lmts[] = { 15, 1000 };
+		int lmts[] = { 10, 500 };
 
-		Mockito.when(TwitterCredentials.getuID()).thenReturn("123");
+		Mockito.when(TwitterCredentials.getuID()).thenReturn("010101");
 
 		Mockito.when(
 				twitter.getUserListMemberships(
@@ -128,40 +118,28 @@ public class TestAccountManager {
 				twitter.getUserListMemberships(
 						TwitterCredentials.getuScreenName(), -1L)).thenReturn(
 				lists);
-		// Twitter twtr, DDManager ddm, CrManager crm, LimitsManager lmg
 		Mockito.when(userlistIterator.hasNext()).thenReturn(true, false);
-
 		Mockito.when(userlistIterator.next()).thenReturn(list);
 		Mockito.when(lists.iterator()).thenReturn(userlistIterator);
-		Mockito.when(list.getId()).thenReturn(1L);
-		Mockito.when(list.getSlug()).thenReturn("get slug");
-		Mockito.when(list.getName()).thenReturn("some name");
-		Mockito.when(list.getMemberCount()).thenReturn(1);
-		Mockito.when(list.getSubscriberCount()).thenReturn(1);
-		Mockito.when(list.getDescription()).thenReturn("some description");
-		// Mockito.when(list.getURI()).thenReturn(/RodResearch/lists/global-citizen-main-stage);
+		
+		Mockito.when(list.getId()).thenReturn(010101L);
+		Mockito.when(list.getSlug()).thenReturn("List slug");
+		Mockito.when(list.getName()).thenReturn("Jhon smith");
+		Mockito.when(list.getMemberCount()).thenReturn(10);
+		Mockito.when(list.getSubscriberCount()).thenReturn(10);
+		Mockito.when(list.getDescription()).thenReturn("List description");
+		Mockito.when(list.getURI()).thenReturn(null);
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
 				cRManager, lManager);
 
-		Map<String, Object> expextedMap = new HashMap<String, Object>();
-		expextedMap.put("id", 1L);
-		expextedMap.put("description", "some description");
-		expextedMap.put("name", "some name");
-		expextedMap.put("subscribers_count", 1);
-		expextedMap.put("slug", "get slug");
-		expextedMap.put("members_count", 1);
-		expextedMap.put("uri", null);
-		List<Map<String, Object>> expected = new ArrayList<Map<String, Object>>();
 		List<Map<String, Object>> result = accountManager.userListMemberships();
-
-		expected.add(expextedMap);
 		assertEquals(expected, result);
 
 	}
 
 	@Test
 	public void getMutesIds() throws TsakException, TwitterException {
-		int lmts[] = { 15, 1000 };
+		int lmts[] = { 10, 500 };
 		long[] idsValue = { 2L };
 		List<Object> expected = new ArrayList<Object>();
 		expected.add(String.valueOf(idsValue[0]));
@@ -183,37 +161,39 @@ public class TestAccountManager {
 
 	@Test
 	public void getMutesLists() throws Exception {
-		int lmts[] = { 15, 1000 };
+		
+		List<Object> expected = new ArrayList<Object>();
+		Map<String, Object> expectedMap = new HashMap<String, Object>();
+		expectedMap.put("id", 010101L);
+		expectedMap.put("location", "London");
+		expectedMap.put("profile_image", "http://someImageUrl/image.jpg");
+		expectedMap.put("friends_count", 10);
+
+		expectedMap.put("name", "Jhon Smith");
+		expectedMap.put("screen_name", "JhonSmith");
+		expectedMap.put("language", "english");
+		expectedMap.put("followers_count", 10);
+		expected.add(expectedMap);		
+		
+		int lmts[] = { 10, 500 };
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.MUTES_USERS_LIST)).thenReturn(
 				lmts);
 		Mockito.when(twitter.getMutesList(-1L)).thenReturn(users);
 		Mockito.when(userIterator.hasNext()).thenReturn(true, false);
-		Mockito.when(userIterator.next()).thenReturn(tuser).thenReturn(tuser);
+		Mockito.when(userIterator.next()).thenReturn(user);
 		Mockito.when(users.iterator()).thenReturn(userIterator);
-		Mockito.when(tuser.getScreenName()).thenReturn("screen_name");
-		Mockito.when(tuser.getName()).thenReturn("name");
-		Mockito.when(tuser.getId()).thenReturn(1L);
-		Mockito.when(tuser.getBiggerProfileImageURL()).thenReturn(
-				"profile image url");
-		Mockito.when(tuser.getFriendsCount()).thenReturn(1);
-		Mockito.when(tuser.getFollowersCount()).thenReturn(1);
-		Mockito.when(tuser.getLocation()).thenReturn("location");
-		Mockito.when(tuser.getLang()).thenReturn("get lang");
-
-		List<Object> expected = new ArrayList<Object>();
-		Map<String, Object> expectedMap = new HashMap<String, Object>();
-		expectedMap.put("id", 1L);
-		expectedMap.put("location", "location");
-		expectedMap.put("profile_image", "profile image url");
-		expectedMap.put("friends_count", 1);
-
-		expectedMap.put("name", "name");
-		expectedMap.put("screen_name", "screen_name");
-		expectedMap.put("language", "get lang");
-		expectedMap.put("followers_count", 1);
-		expected.add(expectedMap);
+		
+		Mockito.when(user.getScreenName()).thenReturn("JhonSmith");
+		Mockito.when(user.getName()).thenReturn("Jhon Smith");
+		Mockito.when(user.getId()).thenReturn(010101L);
+		Mockito.when(user.getBiggerProfileImageURL()).thenReturn(
+				"http://someImageUrl/image.jpg");
+		Mockito.when(user.getFriendsCount()).thenReturn(10);
+		Mockito.when(user.getFollowersCount()).thenReturn(10);
+		Mockito.when(user.getLocation()).thenReturn("London");
+		Mockito.when(user.getLang()).thenReturn("english");
 
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
 				cRManager, lManager);
@@ -223,7 +203,18 @@ public class TestAccountManager {
 
 	@Test
 	public void SavedSearches() throws TwitterException, TsakException {
-		int lmts[] = { 15, 1000 };
+		
+		StringBuilder expected = new StringBuilder();
+		expected.append("{");
+		expected.append("\"id\":\"" + 010101 + "\",");
+		expected.append("\"name\":\"" + "Jhon Smith" + "\",");
+		expected.append("\"query\":\"" + "Emerging technologies" + "\",");
+		expected.append("\"position\":" + 5);
+		expected.append("}");
+		List<String> expectedResult = new ArrayList<String>();
+		expectedResult.add(expected.toString());
+		
+		int lmts[] = { 10, 500 };
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.SAVED_SEARCHES_LIST)).thenReturn(
@@ -233,19 +224,11 @@ public class TestAccountManager {
 		Mockito.when(savedSearchIterator.next()).thenReturn(savedSearch);
 		Mockito.when(savedSearches.iterator()).thenReturn(savedSearchIterator);
 
-		Mockito.when(savedSearch.getId()).thenReturn(1);
-		Mockito.when(savedSearch.getName()).thenReturn("some name");
-		Mockito.when(savedSearch.getQuery()).thenReturn("some query");
-		Mockito.when(savedSearch.getPosition()).thenReturn(9);
-		StringBuilder expected = new StringBuilder();
-		expected.append("{");
-		expected.append("\"id\":\"" + 1 + "\",");
-		expected.append("\"name\":\"" + "some name" + "\",");
-		expected.append("\"query\":\"" + "some query" + "\",");
-		expected.append("\"position\":" + 9);
-		expected.append("}");
-		List<String> expectedResult = new ArrayList<String>();
-		expectedResult.add(expected.toString());
+		Mockito.when(savedSearch.getId()).thenReturn(010101);
+		Mockito.when(savedSearch.getName()).thenReturn("Jhon Smith");
+		Mockito.when(savedSearch.getQuery()).thenReturn("Emerging technologies");
+		Mockito.when(savedSearch.getPosition()).thenReturn(5);
+		
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
 				cRManager, lManager);
 		List<Object> result = accountManager.SavedSearches();
@@ -258,24 +241,25 @@ public class TestAccountManager {
 		int lmts[] = { 15, 1000 };
 		List<Map<String, Object>> expected = new ArrayList<Map<String, Object>>();
 		Map<String, Object> expectedMap = new HashMap<String, Object>();
-		expectedMap.put("name", "some user name");
-		expectedMap.put("tweet", "some tweet");
-		expectedMap.put("screen_name", "some screen_name");
+		expectedMap.put("name", "Jhon Smith");
+		expectedMap.put("tweet", "pandas is the best data analysis toolkit");
+		expectedMap.put("screen_name", "JhonSmith");
 		expected.add(expectedMap);
+		
 		Mockito.when(
 				cRManager.rateLimitAnalyzer(twitter, lManager,
 						LimitsEndPointsVector.FAVORITES_LIST)).thenReturn(lmts);
-
-		PowerMockito.whenNew(Paging.class).withArguments(1,200).thenReturn(page);
+		Paging page = new Paging(1,200);
 		Mockito.when(twitter.getFavorites(page)).thenReturn(statuses);
-
+		Mockito.when(status.getUser()).thenReturn(user);
+		
 		Mockito.when(statusIterator.hasNext()).thenReturn(true, false);
 		Mockito.when(statusIterator.next()).thenReturn(status);
 		Mockito.when(statuses.iterator()).thenReturn(statusIterator);
-		Mockito.when(status.getUser()).thenReturn(tuser);
-	    Mockito.when(tuser.getName()).thenReturn("some user name");
-		 Mockito.when(tuser.getScreenName()).thenReturn("some screen_name");
-		Mockito.when(status.getText()).thenReturn("some tweet");
+		
+	    Mockito.when(user.getName()).thenReturn("Jhon Smith");
+		 Mockito.when(user.getScreenName()).thenReturn("JhonSmith");
+		Mockito.when(status.getText()).thenReturn("pandas is the best data analysis toolkit");
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
 				cRManager, lManager);
 		List<Map<String, Object>> result = accountManager.getFavourities();
@@ -286,7 +270,7 @@ public class TestAccountManager {
 	public void getBlockList() throws TsakException, TwitterException{
 		
 		List<Object> expected = new ArrayList<Object>();
-		expected.add("1\t@some screen name");
+		expected.add(010101L +"\t@JhonSmith");
 		Mockito.when(
 				lManager.getRemainingLimitSpecific(twitter,
 						LimitsEndPointsVector.BLOCKS_LIST,
@@ -298,10 +282,11 @@ public class TestAccountManager {
 		 Mockito.when(twitter.getBlocksList()).thenReturn(users);
 		 
 			Mockito.when(userIterator.hasNext()).thenReturn(true, false);
-			Mockito.when(userIterator.next()).thenReturn(tuser).thenReturn(tuser);
+			Mockito.when(userIterator.next()).thenReturn(user);
 			Mockito.when(users.iterator()).thenReturn(userIterator);
-			Mockito.when(tuser.getId()).thenReturn(1L);
-			Mockito.when(tuser.getScreenName()).thenReturn("some screen name");
+			
+			Mockito.when(user.getId()).thenReturn(010101L);
+			Mockito.when(user.getScreenName()).thenReturn("JhonSmith");
 		
 		AccountManager accountManager = new AccountManager(twitter, ddManager,
 				cRManager, lManager);
